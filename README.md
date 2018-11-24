@@ -10,8 +10,8 @@ Unemployment is a worldwide phenomena and can wildly differ between countries.
 But what country gives the best job environment for an unemployed person.
 
 ### Solution
-Visualizing per country the:
+Visualizing certain details per country like:
 * Unemployment Benefits (werkloosheids uitkering)
 * Job Density (weging hoeveel mensen tegenover hoeveel banen)
 * Average Income (onderscheiden tussen man,vrouw en beide)
-* A quantification of those three factors combined
+* A quantified score of the country
