@@ -44,10 +44,10 @@ All the data needs to be reorganized so that every country belongs to its respec
 
 #### similar
 * the D3 example multi line chart [here](https://beta.observablehq.com/@mbostock/d3-multi-line-chart)
- * I will try something similar with fewer lines and more distinctive colouring and  
- with what each line represents (like in the sketch) I believe mine will be more informative
+  * I will try something similar with fewer lines and more distinctive colouring and  
+ with what each line represents (like in the sketch) I believe mine will be more informative on a grander scale
 * the GDP per country visualization on [wikipedia](https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(PPP)_per_capita#/media/File:Countries_by_GDP_(PPP)_per_capita_in_2017.png)
- * I would like something similar as well, but with a selection of options of what the colouring means and resepctive adjustment to the colouring per country
+  * I would like something similar as well, but with a selection of options of what the colouring means and resepctive adjustment to the colouring per country
  
 #### Hardest parts
 * A way to quantify which country gives the best environment instead of just helping the viewer assess which country it is.
