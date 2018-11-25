@@ -3,10 +3,12 @@
 * Name: Julian Evalle
 * Stud_ID: 11286369
 * Orientation: Data Processing
+###### Application Goal
+To help unemployed people assess which country would give them the best odd of finding a job (assuming they can communicate with the people)
 
 ### Problem Statement
 Unemployment is a worldwide phenomena and can wildly differ between countries.  
-But what country gives the best job environment for an unemployed person.
+Can a visualization help assess what country gives the best job environment for an unemployed person.
 
 ### Solution
 Visualizing certain details per country that help compare and assess  
@@ -42,5 +44,15 @@ All the data needs to be reorganized so that every country belongs to its respec
 
 #### similar
 * the D3 example multi line chart [here](https://beta.observablehq.com/@mbostock/d3-multi-line-chart)
+ * I will try something similar with fewer lines and more distinctive colouring and  
+ with what each line represents (like in the sketch) I believe mine will be more informative
+* the GDP per country visualization on [wikipedia](https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(PPP)_per_capita#/media/File:Countries_by_GDP_(PPP)_per_capita_in_2017.png)
+ * I would like something similar as well, but with a selection of options of what the colouring means and resepctive adjustment to the colouring per country
+ 
+#### Hardest parts
+* A way to quantify which country gives the best environment instead of just helping the viewer assess which country it is.
+* connecting the lower 2 visualizations to the selected country
+* Ordening the data of the countries to continents which may need long lists with country names per continent
+* all the data needs to be read through manually to assess what would be the best year spans to visualize
 
 [ilo]: http://www.ilo.org/ilostat/faces/wcnav_defaultSelection?_afrLoop=3534569229012209&_afrWindowMode=0&_afrWindowId=null#!%40%40%3F_afrWindowId%3Dnull%26_afrLoop%3D3534569229012209%26_afrWindowMode%3D0%26_adf.ctrl-state%3Dkunfunk1c_138
