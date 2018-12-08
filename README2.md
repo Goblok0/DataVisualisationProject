@@ -11,7 +11,9 @@ To give better insight in the watching habits and patterns of anime viewers with
 The MyAnimeList website gives a great documentation tool to keep track of the anime series you've seen, dropped or planned to watch. however it does not give a lot of insight into your preferences and watch patterns, especially when the account owner has seen +100 different series.
 
 ### Solution
-Visualizing specific details to give a better insight into the account holder's preferences. Specifically genre preferences and seasonal preferences
+Visualizing specific details to give a better insight into the account holder's preferences. Specifically genre preferences and seasonal preferences.
+
+The MVP would be the horizontal bar chart, with the other visualization giving more details or other aspects of the user's viewing habits
 
 ![alt text](doc/prop2.2_figure.png)
 
