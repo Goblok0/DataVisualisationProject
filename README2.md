@@ -41,13 +41,12 @@ All the data needs to be reorganized so that every title belongs to a specific y
 
 #### similar
 * the D3 example multi line chart [here](https://beta.observablehq.com/@mbostock/d3-multi-line-chart)
-  * I will try something similar with fewer lines and more distinctive colouring and an option to remove specific lines
- with what each line represents (like in the sketch) I believe mine will be more informative on a grander scale
+  * I will try something similar with fewer lines and more distinctive colouring(like in the sketch) and an option to remove specific lines with what each line represents.
 * the genre visualization on [this site](http://beckyryde.weebly.com/chart-of-preferred-genres.html)
   * A horizontal bar chart seems to be easier to intuitively see which genre is seen the most, compared to the others. Moreover the radial bar chart could be made as an extra to see with wich genres it is combined the most with
  
 #### Hardest parts
 * To make a universally applicable data structure for each visualization, else the least amount of structures necessary to visualize the data
-* what to do with gaps in the data in the line chart when not a single show has been watch in that year, potentially select another form of visualization
+* what to do with gaps in the data in the line chart when not a single show has been watch in that year, potentially select another form of visualization like a multi-bar chart
 
 [mal]: https://myanimelist.net/animelist/Goblok?status=2
