@@ -24,27 +24,39 @@ SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
 BACKUP_DIR = os.path.join(SCRIPT_DIR, 'HTML_BACKUPS')
 
 def main():
+    # corresponding to page: Completed, OnHold, Dropped & PlanToWatch
+    page_index = [2,3,4,6]
+    # name_index = { 2: "Completed",
+    #                3: "OnHold",
+    #                4: "Dropped",
+    #                6: "PlanToWatch"
+    #              }
+    full_anime_list = []
+    for index in page_index:
+        MAL_URL = f"https://myanimelist.net/animelist/{username}?status={index}"
+        source_data = get_source(MAL_URL)
+        # Make backup of the IMDB top 250 movies page
+        print('Access MAL page, making backup ...')
+        mal_html = simple_get(MAL_URL)
+        mal_dom = BeautifulSoup(source_data)
 
-    index = 2
-    MAL_URL = f"https://myanimelist.net/animelist/{username}?status={index}"
-    source_data = get_source(MAL_URL)
-    # Make backup of the IMDB top 250 movies page
-    print('Access MAL page, making backup ...')
-    mal_html = simple_get(MAL_URL)
-    mal_dom = BeautifulSoup(source_data)
+        # extract the top 250 movies
+        print('Scraping top 250 page ...')
+        url_strings = scrape_mal(mal_dom)
+        print(len(url_strings))
 
-    # extract the top 250 movies
-    print('Scraping top 250 page ...')
-    url_strings = scrape_mal(mal_dom)
-    print(len(url_strings))
+        anime_list = []
+        for url in url_strings:
+            anime_html = simple_get(url)
+            anime_dom = BeautifulSoup(anime_html, "lxml")
+            scraped_info = scrape_page(anime_dom)
+            print(scraped_info)
+            anime_list.append(scraped_info)
+        print(anime_list)
+        full_anime_list.append(anime_list)
 
-    details_list = []
-    for url in url_strings:
-
-        anime_html = simple_get(url)
-        anime_dom = BeautifulSoup(anime_html, "lxml")
-        scraped_info = scrape_page(anime_dom)
-        details_list.append(scraped_info)
+    with open(f'{username}.json', 'w') as outfile:
+        json.dump(full_anime_list, outfile)
 
 
 def simple_get(url):
@@ -122,43 +134,139 @@ def scrape_page(dom):
         +title,
         +e.title
         +year,
-        -season,
+        +season,
         +month,
-        -day,
-        -episodes,
-        -duration,
-        -genres,
-        -studio,
-        -type
+        +day,
+        +episodes,
+        +duration,
+        +genres,
+        +studio,
+        +type
     """
     title = dom.find('h1')
     title = title.text.strip()
-    print(title)
+
+    # print(title)
     e_title = dom.find('div', {"class": "spaceit_pad"})
     e_title = e_title.text.strip()
     # print(e_title)
     for detail in dom.find_all('div'):
         detail = detail.text.strip()
         # print(detail)
+        #  extracts date details
         if "Aired:" in detail:
             # print(detail)
             date = detail.split(" ")
             if len(date) > 12:
                 continue
-            print(date)
-            if len(date) < 5:
+
+            elif len(date) < 5:
                 month = date[2]
                 year = date[3]
             else:
                 month = date[2]
                 year = date[4]
-
+            # print(month)
+            # print(year)
+        # extracts the premiered season
         elif "Premiered:" in detail:
-            date = detail.split(" ")
+            season = detail.split(" ")
             # print(date)
-            season = date[0]
+            season = season[0]
             season = season[11:]
+            # print(season)
+        elif "Broadcast:" in detail:
+            day = detail.split(" ")
+            day = day[4]
             # print(day)
+        elif "Duration:" in detail:
+            duration = detail.split(" ")
+            # print(duration)
+            if ("hr." in detail) and ("min." in detail):
+                hours = int(duration[2]) * 60
+                minutes = int(duration[4]) + hours
+            elif "hr." in detail:
+                minutes = int(duration[2]) * 60
+            else:
+                try:
+                    minutes = int(duration[2])
+                except ValueError:
+                    minutes = "unknown"
+            # print(minutes)
+        elif "Genres:" in detail:
+            # print(detail)
+            genres = detail[8:]
+            genres = genres.split(", ")
+            # cut off irrelevant string
+            # print(genres)
+        elif "Studios:" in detail:
+            # print(detail)
+            # studio = detail[8:]
+            studio = detail.split("\n")
+            # print(studio)
+            studio.pop(0)
+            if "," in studio:
+                studio = studio.split(",")
+            # cut off irrelevant string
+            # print(studio)
+        elif "Type:" in detail:
+            # print(detail)
+            # studio = detail[8:]
+            type = detail.split("\n")
+            try:
+                type = type[1]
+            except IndexError:
+                type = "unknown"
+            # cut off irrelevant string
+            # print(type)
+
+
+    episodes = dom.find('span', {"id": "curEps"}).text.strip()
+
+    try:
+        [title, e_title, year, season, month, day, episodes, minutes, genres,
+        studio, type]
+    except:
+        try:
+            year
+        except NameError:
+            year = "unknown"
+        try:
+            season
+        except NameError:
+            season = "unknown"
+        try:
+            month
+        except NameError:
+            month = "unknown"
+        try:
+            day
+        except NameError:
+            day = "unknown"
+        try:
+            episodes
+        except NameError:
+            episodes = "unknown"
+        try:
+            minutes
+        except NameError:
+            minutes = "unknown"
+        try:
+            genres
+        except NameError:
+            genres = ["unknown"]
+        try:
+            studio
+        except NameError:
+            studio = ["unknown"]
+        try:
+            type
+        except NameError:
+            type = "unknown"
+
+    return [title, e_title, year, season, month, day, episodes, minutes,
+            genres, studio, type]
+
 
 
 if __name__ == '__main__':
