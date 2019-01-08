@@ -4,6 +4,7 @@ import csv
 import codecs
 import errno
 import time
+import json
 
 from requests import get
 from requests.exceptions import RequestException
@@ -55,8 +56,11 @@ def main():
         print(anime_list)
         full_anime_list.append(anime_list)
 
-    with open(f'{username}.json', 'w') as outfile:
-        json.dump(full_anime_list, outfile)
+        with open(f'{username}_{index}.json', 'w') as outfile:
+            json.dump(anime_list, outfile)
+    #
+    # with open(f'{username}.json', 'w') as outfile:
+    #     json.dump(full_anime_list, outfile)
 
 
 def simple_get(url):
@@ -157,15 +161,19 @@ def scrape_page(dom):
         if "Aired:" in detail:
             # print(detail)
             date = detail.split(" ")
-            if len(date) > 12:
-                continue
+            try:
+                if len(date) > 12:
+                    continue
+                elif len(date) < 5:
+                    month = date[2]
+                    year = date[3]
+                else:
+                    month = date[2]
+                    year = date[4]
 
-            elif len(date) < 5:
-                month = date[2]
-                year = date[3]
-            else:
-                month = date[2]
-                year = date[4]
+            except IndexError:
+                month = "unknown"
+                year = "unknown"
             # print(month)
             # print(year)
         # extracts the premiered season
