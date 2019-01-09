@@ -1,30 +1,53 @@
 window.onload = function() {
     // decodes the JSON file
     var username = "goblok"
-    var requests = [d3.json(`${username}_2.json`)];
+    var listType = "2"
+    var requests = [d3.json(`${username}_${listType}.json`)];
     // ensures that all data is loaded properly before calling any functions
     Promise.all(requests).then(function(response) {
         // preprocesses the data
-        barData = preBarData(response);
+        var data = preProcess(response)
+        console.log(data[0][0])
+        makeBarGraph(data[0][0])
 
     }).catch(function(e){
              throw(e);
              });
 };
-
-const preBarData = function(data){
-    console.log(data)
-    bardict = {}
-    for (variable of data){
-        barDict[variable[8]]++;
-    };
-    console.log(barDict)
+const preProcess = function(data){
+    var barData = preBarData(data[0])
+    return [barData]
 }
-// const makeGraph = function(countryDict, countriesArray){
+const preBarData = function(data){
+    console.log(data.length)
+    console.log(data)
+    barGenreDict = {}
+    barStudioDict = {}
+    // increments xLabel data
+    for (variable of data){
+        // console.log(variable[8])
+        for (genre of variable[8]){
+            if (!(barGenreDict[genre])){
+               barGenreDict[genre] = 0
+            }
+            barGenreDict[genre]++
+        }
+        for (studio of variable[9]){
+            if (!(barStudioDict[studio])){
+               barStudioDict[studio] = 0
+            }
+            barStudioDict[studio]++
+        }
+    };
+    console.log(barGenreDict)
+    console.log(barStudioDict)
+    return [barGenreDict, barStudioDict]
+}
+const makeBarGraph = function(data){
 
     // defines the size of the SVG
     var width = 600;
-    var height = 600;
+    var height = 400;
 
     // defines the padding for the graph
     pad = {
@@ -42,7 +65,18 @@ const preBarData = function(data){
     var svg = d3.select("body")
                 .append("svg")
                 .attr("width", width)
-                .attr("height", height);
+                .attr("height", height)
+                .attr("class", "barchart");
+    d3.select("body")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("class", "linechart");
+    d3.select("body")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("class", "heatchart");
 
     // creates the background of the SVG-element
     svg.append("rect")
@@ -119,3 +153,4 @@ const preBarData = function(data){
        .attr("transform", "translate("+ (pad.left * 0.8) + ","
                                       + 0 + ")")
        .call(yAxis);
+}

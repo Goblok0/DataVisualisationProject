@@ -14,7 +14,7 @@ Data is already extracted and transformed to usable {username}_{list-type}.JSON 
 * list type number representing either: Completed, on-hold, dropped or plan-to-watch
 
 ### Diagram
-![alt text](doc/prop2.3_figure.png)
+![alt text](doc/design_diagram.png)
 ![alt text](doc/flowchart.png)
 
 

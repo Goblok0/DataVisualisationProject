@@ -213,6 +213,7 @@ def scrape_page(dom):
             studio = detail.split("\n")
             # print(studio)
             studio.pop(0)
+            # does not split studios properly
             if "," in studio:
                 studio = studio.split(",")
             # cut off irrelevant string
