@@ -15,6 +15,7 @@ Data is already extracted and transformed to usable {username}_{list-type}.JSON 
 
 ### Diagram
 ![alt text](doc/prop2.3_figure.png)
+![alt text](doc/flowchart.png)
 
 
 ### Descriptions
