@@ -1,3 +1,7 @@
+
+// credit slider: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+
+
 var dataGlob = []
 window.onload = function() {
     // decodes the JSON file
@@ -8,8 +12,9 @@ window.onload = function() {
     Promise.all(requests).then(function(response) {
         // preprocesses the data
         var data = preProcess(response)
+        console.log(data)
         barDataGenres = data[0][0]
-        console.log(data[0][0])
+        console.log(data[0][1])
         makeBarGraph(barDataGenres)
         makeLineGraph()
         makeHeatGraph()
@@ -46,33 +51,46 @@ const preBarData = function(data){
     };
     // console.log(genreDict)
     // console.log(studioDict)
-    genreList = []
-    studioList = []
+    smallGenreList = []
+    bigGenreList = []
+    smallStudioList = []
+    bigStudioList = []
 
     for (let key of Object.keys(genreDict)){
-        entryDict = {}
-        entryDict["genre"] = key
-        entryDict["value"] = genreDict[key]
+        // entryDict = {}
+        // entryDict["genre"] = key
+        // entryDict["value"] = genreDict[key]
         if (key == "unknown"){
           continue
         }
-        // genreList.push([key,genreDict[key]]);
-        genreList.push(entryDict)
+        if (parseInt(genreDict[key]) < 50){
+            smallGenreList.push([key,genreDict[key]]);
+        }
+        else {
+            bigGenreList.push([key,genreDict[key]]);
+        }
+        // genreList.push(entryDict)
     };
     for (let key of Object.keys(studioDict)){
         // entryDict = {}
-        // entryDict[genre] = key
+        // entryDict["studio"] = key
         // entryDict[value] = genreDict[key]
         if (key == "unknown"){
           continue
         }
-        studioList.push([key,studioDict[key]]);
+        if (parseInt(studioDict[key]) < 10){
+            smallStudioList.push([key,studioDict[key]]);
+        }
+        else {
+            bigStudioList.push([key,studioDict[key]]);
+        }
         // genreList.push(entryDict)
     };
-
-    // console.log(genreList)
-    // console.log(studioList)
-    return [genreList, studioList]
+    //
+    // for (let key of Object)
+    // // console.log(genreList)
+    // // console.log(studioList)
+    return [[bigGenreList, smallGenreList], [bigStudioList, smallStudioList]]
 }
 
 const preLineData = function(data){
@@ -114,6 +132,11 @@ const preLineData = function(data){
 
 const makeBarGraph = function(data){
 
+
+    data = data[0]
+    data.sort(function(a, b) {
+              return d3.ascending(a[1], b[1])
+              })
     console.log(data)
     // defines the size of the SVG
     var width = 600;
@@ -122,8 +145,8 @@ const makeBarGraph = function(data){
     // defines the padding for the graph
     pad = {
       top: height * 0.1,
-      bottom: height * 0.2,
-      left: width* 0.15,
+      bottom: height * 0.1,
+      left: width * 0.2,
       right: width * 0.05
     };
 
@@ -142,6 +165,27 @@ const makeBarGraph = function(data){
                 .attr("width", width)
                 .attr("height", height)
                 .attr("class", "baroptions");
+    var testData = ["Genres","Studio"]
+    barData = bOptions.selectAll("inputBD")
+                     .data(testData)
+                     .enter()
+                     .append("label")
+                     .text(function(d){return d})
+                     .append("input")
+                     .attr("type", "radio")
+                     .attr("name", "box1")
+                     .attr("value", function(d){
+                                    return d
+                     })
+     barType = bOptions.selectAll("inputBT")
+                      .data(["Big Data", "Small Data"])
+                      .enter()
+                      .append("label")
+                      .text(function(d){return d})
+                      .append("input")
+                      .attr("type", "radio")
+                      .attr("name", "BarType")
+                      .attr("value", function(d){return d})
 
     // creates the background of the SVG-element
     svg.append("rect")
@@ -150,72 +194,99 @@ const makeBarGraph = function(data){
        .attr("fill", "grey")
        .attr("opacity", 0.1);
 
+     // isolates the lowest data value from the data
+     var min = d3.min(data, function(d){
+                                return d[1];
+                                });
+     // isolates the highest data value from the data
+     var max = d3.max(data, function(d){
+                                return d[1];
+                                });
+
+    console.log(max)
+
      yScale = d3.scaleBand()
-                .range([hChart, 0])
-                .padding(0.1)
+                .range([height - pad.bottom, pad.top])
      xScale = d3.scaleLinear()
-                .range([pad.left, wChart-pad.right])
+                .range([pad.left, width - pad.right])
 
-      // isolates the lowest data value from the data
-      var min = d3.min(data, function(d){
-                                 return d.value;
-                                 });
-      // isolates the highest data value from the data
-      var max = d3.max(data, function(d){
-                                 return d.value;
-                                 });
-
-      yScale.domain([data.map(function(d){
-                              return d.genre
-                              })])
-      xScale.domain([0, max])
+     yScale.domain(data.map(function(d){
+                             return d[0]
+                             }))
+     xScale.domain([45, max])
 
 
     var rects = svg.selectAll("rect")
                    .data(data)
                    .enter()
                    .append("rect")
-                   .attr("width", function(d) {return xScale(d.value); } )
-                   .attr("y", function(d,i) { return 10 * i; })
+                   .attr("y", function(d) {return yScale(d[0]);})
                    .attr("x", pad.left)
-                   .attr("height", 5);;
+                   .attr("width", function(d) {return xScale(d[1]) - pad.left;})
+                   .attr("height", yScale.bandwidth() * 0.9);
 
-      // add the x Axis
+    // add the x Axis
     svg.append("g")
-        .attr("transform", "translate(" + pad.left+ "," + hChart+ ")")
+        .attr("transform", "translate(" + 0 + "," + height * 0.9 + ")")
         .call(d3.axisBottom(xScale));
 
     // add the y Axis
     svg.append("g")
-        .attr("transform", "translate(" + pad.left + "," + pad.bottom+ ")")
+        .attr("transform", "translate(" + pad.left * 0.9 + "," + 0+ ")")
         .call(d3.axisLeft(yScale));
 }
+
 const makeLineGraph = function(data){
   var width = 600;
   var height = 400;
-  testData1 = [{x: 1997, y: 1}, {x: 1998, y: 5}]
-  testData2 = [{x: 1997, y: 1}, {x: 1998, y: 5}]
+  pad = {
+    top: height * 0.1,
+    bottom: height * 0.2,
+    left: width* 0.15,
+    right: width * 0.05
+  };
+
+  var wChart = width - pad.left - pad.right;
+  var hChart = height - pad.bottom - pad.top;
+
+  n = 2
+  slideValue = 2003
+  lowerBound = slideValue - 10
+  upperBound = slideValue + 10
+
+  testData1 = [{x: 1997, y: 1}, {x: 1998, y: 5}, {x: 1999, y: 5}]
+  testData2 = [{x: 1997, y: 4}, {x: 1998, y: 1}, {x: 1999, y: 3}]
+
   svg = d3.select("body")
           .append("svg")
           .attr("width", width)
           .attr("height", height)
           .attr("class", "linechart");
 
+  xScale = d3.scaleLinear()
+             .domain([lowerBound, upperBound])
+             .range([pad.left, width-pad.right])
+  yScale = d3.scaleLinear()
+             .domain([0,5])
+             .range([width - pad.bottom, pad.top])
+   var line = d3.line()
+     .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+     .y(function(d) { return yScale(yScale(d.y)); }) // set the y values for the line generator
 
 
 
+  svg.append("path")
+     .datum(testData1)
+     .attr("class", "line")
+     .attr("d", line)
+
+     lOptions = d3.select("body")
+                 .append("div")
+                 .attr("width", width)
+                 .attr("height", height)
+                 .attr("class", "lineoptions");
 
 
-
-  lOptions = d3.select("body")
-              .append("div")
-              .attr("width", width)
-              .attr("height", height)
-              .attr("class", "lineoptions");
-  // lOptions.append("input")
-  //         .attr("type", "checkbox")
-  //         .attr("name", "box1")
-  //         .attr("value", "MEH")
   var testData = ["genre1","genre2","genre3","genre4"]
   labels = lOptions.selectAll("input")
                    .data(testData)
@@ -226,20 +297,137 @@ const makeLineGraph = function(data){
                    .attr("type", "checkbox")
                    .attr("name", "box1")
                    .attr("value", "MEH")
+   lOptions.append("label")
+            .text("Show all years")
+            .append("input")
+            .attr("type", "submit")
+            .attr("name", "lineAllYears")
+            .attr("value", "MEH")
 
 
 }
 const makeHeatGraph = function(data){
   var width = 600;
   var height = 400;
-  d3.select("body")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("class", "heatchart");
+
+  pad = {
+    top: height * 0.1,
+    bottom: height * 0.2,
+    left: width* 0.15,
+    right: width * 0.05
+  };
+
+  var wChart = width - pad.left - pad.right;
+  var hChart = height - pad.bottom - pad.top;
+
+  svg = d3.select("body")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("class", "heatchart");
   hOptions = d3.select("body")
                 .append("div")
                 .attr("width", width)
                 .attr("height", height)
                 .attr("class", "heatoptions");
+
+  var valueElement = svg.append("div")
+                      .attr("class", "col-sm-2")
+                      .append("p")
+                      .attr("id", "value-time")
+  var slideElement = svg.append("div")
+                      .attr("class", "col-sm")
+                      .append("p")
+                      .attr("id", "slider-time")
+
+  // Time
+  var dataTime = d3.range(0, 12).map(function(d) {
+    return new Date(1996 + d, 10, 3);
+  });
+
+  var sliderTime = d3
+    .sliderBottom()
+    .min(d3.min(dataTime))
+    .max(d3.max(dataTime))
+    .step(1000 * 60 * 60 * 24 * 365)
+    .width(300)
+    .tickFormat(d3.timeFormat('%Y'))
+    .tickValues(dataTime)
+    .default(new Date(1998, 10, 3))
+    .on('onchange', val => {
+      valueElement.text(d3.timeFormat('%Y')(val));
+      console.log(val)
+    });
+
+  var gTime = svg
+    .append('svg')
+    .attr('width', 500)
+    .attr('height', 100)
+    .attr("x", pad.left)
+    .attr("y", height - 100)
+    .append('g')
+    .attr('transform', 'translate(50,50)');
+
+  gTime.call(sliderTime);
+
+  valueElement.text(d3.timeFormat('%Y')(sliderTime.value()));
+
+
+  // set scaler for alpha colour
+  var colScale = d3.scaleLinear()
+                   .domain([0, 150])
+                   .range([0.3, 1]);
+  // makes legend data for the chloropleth map
+  var legData = [[0, "<5 watched"],
+                 [100, "5-10 watched"],
+                 [150, "+10 watched"]]
+  // creates legend element
+  var legend = svg.selectAll(".legend")
+                  .data(legData)
+                  .enter()
+                  .append("g")
+                  .attr("class", "legend")
+                  .attr("transform", function(d,i) {
+                                     var legX = 500
+                                     var legY = 300
+                                     return "translate(" + legX + ","
+                                                         + legY + ")"
+                                     })
+                  .style("font-size","10px");
+  // creates the background for the legend
+  legend.append('rect')
+        .attr('width', 400)
+        .attr('height', legData.length * 20)
+        .attr("x", 0)
+        .attr("y", -20)
+        .style('fill', "white")
+        .attr("opacity", 0.2)
+        .style('stroke', "black");
+
+    // creates the square-colour symbol in the legend
+    legend.append("rect")
+          .attr('width', 50)
+          .attr('height', 20)
+          .attr('x', 10)
+          .attr('y', function(d,i){
+                     var y = i * 15 - 15;
+                     return y;
+                     })
+          .attr("fill", function(d) {
+                        var colValue = colScale(d[0]);
+                        var colour = `rgba(255,0,0,${colValue})`;
+                        return colour;
+                        });
+    // creates the description beloning to each square symbol in the legend
+    legend.append('text')
+          .attr('x', 70)
+          .attr('y', function(d,i){
+                     var y = i * 15;
+                     return y;
+                     })
+          .text(function(d){
+                return d[1];
+                });
+
+
 }

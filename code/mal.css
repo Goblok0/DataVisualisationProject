@@ -84,3 +84,6 @@ div.heatoptions{
   background-color: blue;
   border: 2px solid black;
 }
+div.col-sm{
+  left: 850px;
+}
