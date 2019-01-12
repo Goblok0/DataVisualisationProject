@@ -24,3 +24,8 @@
   * heb zoals gepland, de bar chart data gesplits tussen een grote groep en een kleine groep. de grens van de splitsing is geplaats op 50 (en bij studio 10) omdat het leek dat dat ongeveer een evenredige splitsing zou zorgen tussen de data.
     * later een dynamische grens implementeren, voor gebruikers met meer data
   * note to self: behoud de opties in hun eigen SVG, aangezien ze verplaats moeten worden indien ik extra grafieken ga gebruiken. Hierdoor kunnen ze makkelijk samen verplaats worden indien noodzakelijk
+  * Heb de bargrafieken kunnen sorteren dmv D3, wat noodzakelijk is om de data begrijpelijk te presenteren.      
+    * Indien tijd over overweeg ook dergelijke sortering op naam
+
+# day 5.3(Saturday)
+  * heb de radiobuttons data verdeeld tussen BD(Type data die gebruikt word: Genre of studio) en BT(Welk deel van de gekozen data het gebruikt de grote of kleine hoeveelheden)

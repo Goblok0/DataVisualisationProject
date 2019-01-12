@@ -87,3 +87,7 @@ div.heatoptions{
 div.col-sm{
   left: 850px;
 }
+.line {
+  stroke-width: 2;
+  fill: none;
+}

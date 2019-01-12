@@ -12,11 +12,13 @@ window.onload = function() {
     Promise.all(requests).then(function(response) {
         // preprocesses the data
         var data = preProcess(response)
-        console.log(data)
-        barDataGenres = data[0][0]
-        console.log(data[0][1])
-        makeBarGraph(barDataGenres)
-        makeLineGraph()
+        // console.log(data)
+        // barDataGenres = data[0][0]
+        barData = data[0]
+        lineData = data[1]
+        // console.log(data[0][1])
+        makeBarGraph(barData)
+        makeLineGraph(lineData)
         makeHeatGraph()
 
     }).catch(function(e){
@@ -26,10 +28,10 @@ window.onload = function() {
 const preProcess = function(data){
     var barData = preBarData(data[0])
     var lineData = preLineData(data[0])
-    return [barData]
+    return [barData, lineData]
 }
 const preBarData = function(data){
-    console.log(data.length)
+    // console.log(data.length)
     // console.log(data)
     genreDict = {}
     studioDict = {}
@@ -94,15 +96,18 @@ const preBarData = function(data){
 }
 
 const preLineData = function(data){
-    console.log(data)
+    // console.log(data)
     yearDict = {}
-    seasonDict = {}
     genreDict = {}
 
     for (variable of data){
         title = variable[0]
         year = variable[2]
         for (genre of variable[8]){
+            // check if genre has already been seen before
+            if (genre == "unknown"){
+                continue
+            }
             if (!(genreDict[genre])){
                genreDict[genre] = {}
             }
@@ -113,9 +118,9 @@ const preLineData = function(data){
             inDict[year].push(title)
         }
     };
-    console.log(genreDict)
+    // console.log(genreDict)
     yearRange = Array.from(new Array(33), (x,i) => i + 1986)
-    console.log(yearRange)
+    // console.log(yearRange)
     // fill up the empty years
     for (year of yearRange){
         // console.log(year)
@@ -126,18 +131,55 @@ const preLineData = function(data){
             }
         }
     }
-    console.log(genreDict)
-    genreList = []
+    // console.log(genreDict)
+    // var lineData = {}
+    // for (let key of Object.keys(genreDict)){
+    //     genre = key
+    //     lineData[genre] = []
+    //     inGenre = genreDict[key]
+    //     for (year of Object.keys(inGenre)){
+    //         // console.log(year)
+    //         yearData = inGenre[year]
+    //         // console.log(yearData)
+    //         year = parseInt(year)
+    //         lineData[genre].push([year, yearData])
+    //     }
+    // };
+
+    lineData = []
+    var parseDate = d3.timeParse("%Y")
+    for (let key of Object.keys(genreDict)){
+        lineDataDict = {}
+        lineDataDict["genre"] = `${key}`
+        lineDataDict["years"] = []
+        inGenre = genreDict[key]
+        // console.log(inGenre)
+        for (year of Object.keys(inGenre)){
+            // console.log(year)
+            yearDict = {}
+            // yearDict["year"] = parseDate(year)
+            yearDict["year"] = parseInt(year)
+            yearDict["yearData"] = inGenre[year]
+            lineDataDict["years"].push(yearDict)
+        }
+        // lineDataDict[]
+        lineData.push(lineDataDict)
+    };
+    console.log(lineData)
+
+    return lineData
+
 }
 
 const makeBarGraph = function(data){
 
-
+    data = data[0]
+    // pick bigBardata temporarily
     data = data[0]
     data.sort(function(a, b) {
               return d3.ascending(a[1], b[1])
               })
-    console.log(data)
+
     // defines the size of the SVG
     var width = 600;
     var height = 400;
@@ -237,14 +279,17 @@ const makeBarGraph = function(data){
 }
 
 const makeLineGraph = function(data){
+  console.log(data)
+  // console.log(data.Action)
+  // data = data.Action
   var width = 600;
   var height = 400;
   pad = {
-    top: height * 0.1,
-    bottom: height * 0.2,
-    left: width* 0.15,
-    right: width * 0.05
-  };
+          top: height * 0.1,
+          bottom: height * 0.2,
+          left: width* 0.15,
+          right: width * 0.05
+        };
 
   var wChart = width - pad.left - pad.right;
   var hChart = height - pad.bottom - pad.top;
@@ -254,8 +299,8 @@ const makeLineGraph = function(data){
   lowerBound = slideValue - 10
   upperBound = slideValue + 10
 
-  testData1 = [{x: 1997, y: 1}, {x: 1998, y: 5}, {x: 1999, y: 5}]
-  testData2 = [{x: 1997, y: 4}, {x: 1998, y: 1}, {x: 1999, y: 3}]
+  max = findMax(data)
+  console.log(max)
 
   svg = d3.select("body")
           .append("svg")
@@ -263,22 +308,66 @@ const makeLineGraph = function(data){
           .attr("height", height)
           .attr("class", "linechart");
 
-  xScale = d3.scaleLinear()
-             .domain([lowerBound, upperBound])
-             .range([pad.left, width-pad.right])
-  yScale = d3.scaleLinear()
-             .domain([0,5])
-             .range([width - pad.bottom, pad.top])
-   var line = d3.line()
-     .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
-     .y(function(d) { return yScale(yScale(d.y)); }) // set the y values for the line generator
 
+ var lineOpacity = "0.25";
+ var lineOpacityHover = "0.85";
+ var otherLinesOpacityHover = "0.1";
+ var lineStroke = "1.5px";
+ var lineStrokeHover = "2.5px";
+ //
+ // // var parseDate = d3.timeParse("%Y");
+ // data.forEach(function(d) {
+ //   d.years.forEach(function(d) {
+ //     d.year = d.year;
+ //     d.yearData = +d.yearData.length;
+ //   });
+ // });
 
+ var xScale = d3.scaleLinear()
+                // .domain([lowerBound, upperBound])
+                .domain([1986, 2018])
+                .range([pad.left, width - pad.right])
+ var yScale = d3.scaleLinear()
+                .domain([0, max])
+                .range([height - pad.bottom, pad.top])
 
-  svg.append("path")
-     .datum(testData1)
-     .attr("class", "line")
-     .attr("d", line)
+ var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+ var line = d3.line()
+              .x(d => xScale(d.year))
+              .y(d => yScale(d.yearData.length))
+
+ let lines = svg.append('g')
+                .attr("class", "lines");
+
+ lines.selectAll(".line-group")
+      .data(data).enter()
+      .append("g")
+      .attr('class', 'line-group')
+      .append('path')
+        .attr('class', 'line')
+        .attr('d', d => line(d.years))
+        .style('stroke', (d, i) => color(i))
+        .style('opacity', lineOpacity)
+      var xAxis = d3.axisBottom(xScale).ticks(5);
+    var yAxis = d3.axisLeft(yScale).ticks(5);
+
+  var xAxis = d3.axisBottom()
+                .scale(xScale)
+                .tickFormat(d3.format("d"));
+  var yAxis = d3.axisLeft()
+                .scale(yScale);
+
+  svg.append("g")
+     .attr("transform", "translate("+ 0 + ","
+                                    + yScale(0) + ")")
+     .call(xAxis);
+  // creates the Y-axis
+  svg.append("g")
+     .attr("transform", "translate("+ (pad.left) + ","
+                                    + 0 + ")")
+     .call(yAxis);
+
 
      lOptions = d3.select("body")
                  .append("div")
@@ -297,6 +386,7 @@ const makeLineGraph = function(data){
                    .attr("type", "checkbox")
                    .attr("name", "box1")
                    .attr("value", "MEH")
+
    lOptions.append("label")
             .text("Show all years")
             .append("input")
@@ -430,4 +520,23 @@ const makeHeatGraph = function(data){
                 });
 
 
+}
+
+const findMax = function(data){
+    max = 0
+    console.log(data)
+    for (key of Object.keys(data)){
+      // console.log(data[key])
+
+      yearData = data[key].years
+      console.log(yearData)
+      var genreMax = d3.max(yearData, function(d){
+                                 return d.yearData.length;
+                                 });
+      if (genreMax > max){
+          max = genreMax
+      }
+    }
+    console.log(max)
+    return max
 }
