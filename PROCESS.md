@@ -29,3 +29,8 @@
 
 # day 5.3(Saturday)
   * heb de radiobuttons data verdeeld tussen BD(Type data die gebruikt word: Genre of studio) en BT(Welk deel van de gekozen data het gebruikt de grote of kleine hoeveelheden)
+  * heb de data structuur voor de multi-line chart aangepast, zodat het bruikbaar is voor de manier waarop [deze site](https://codepen.io/anon/pen/Jwewwg?editors=1012) zijn multi-line chart maakt
+    *  note to self: proper credit geven
+# day 5.6(Sunday)
+ * Data voor de heatmap is geordend op een manier dat bruikbaar is voor de season-heatmap
+ * elke chartdata is opgezet voor de genres, maar nog niet voor de studios, ten eerste zijn de genres neezetten belangrijker omdat het waarschijnlijk interessanter is voor de gebruiker. Maar studio zal uiteinderlijk worden opgezet

@@ -26,10 +26,12 @@ window.onload = function() {
              });
 };
 const preProcess = function(data){
-    var barData = preBarData(data[0])
-    var lineData = preLineData(data[0])
-    return [barData, lineData]
-}
+    var data = data[0];
+    var barData = preBarData(data);
+    var lineData = preLineData(data);
+    var heatData = preHeatData(data);
+    return [barData, lineData, heatData];
+};
 const preBarData = function(data){
     // console.log(data.length)
     // console.log(data)
@@ -171,6 +173,86 @@ const preLineData = function(data){
 
 }
 
+const preHeatData = function(data){
+    console.log(data)
+    // console.log(data)
+    genreDict = {}
+
+    for (variable of data){
+        // console.log(variable)
+        title = variable[0]
+        year = variable[2]
+        season = variable[3]
+        for (genre of variable[8]){
+            // check if genre has already been seen before
+            if ((genre == "unknown") || (season == "unknown")){
+                continue
+            }
+            if (!(genreDict[genre])){
+               genreDict[genre] = {}
+            }
+            inDict = genreDict[genre]
+            if (!(inDict[year])){
+               inDict[year] = {}
+            }
+            inYear = inDict[year]
+            if (!(inYear[season])){
+               inYear[season] = []
+            }
+            inYear[season].push(title)
+        }
+    };
+    seasons = ["Winter", "Spring", "Summer", "Fall"]
+    // console.log(genreDict)
+    yearRange = Array.from(new Array(33), (x,i) => i + 1986)
+    // console.log(yearRange)
+    // fill up the empty years and empty seasons
+    for (year of yearRange){
+        // console.log(year)
+        for (genre of Object.keys(genreDict)){
+            // console.log(genre)
+            if(!genreDict[genre][year]){
+                genreDict[genre][year] = {}
+            }
+            for (season of seasons){
+                if(!genreDict[genre][year][season]){
+                    genreDict[genre][year][season] = []
+                }
+            }
+        }
+    }
+    console.log(genreDict)
+    genreList = []
+    for (genre of Object.keys(genreDict)){
+        inGenre = genreDict[genre]
+        for (year of Object.keys(inGenre)){
+            inYear = inGenre[year]
+            for (season of Object.keys(inYear)){
+                heatEntry = {}
+                heatEntry["genre"] = genre
+                if (season == "Winter"){
+                    heatEntry["season"] = 1
+                }
+                if (season == "Spring"){
+                   heatEntry["season"] = 2
+                }
+                if (season == "Summer"){
+                   heatEntry["season"] = 3
+                }
+                if (season == "Fall"){
+                   heatEntry["season"] = 4
+                }
+                heatEntry["year"] = year
+                heatEntry["value"] = inYear[season]
+                genreList.push(heatEntry)
+              }
+
+            }
+        }
+    console.log(genreList)
+    return genreList
+}
+
 const makeBarGraph = function(data){
 
     data = data[0]
@@ -285,8 +367,8 @@ const makeLineGraph = function(data){
   var width = 600;
   var height = 400;
   pad = {
-          top: height * 0.1,
-          bottom: height * 0.2,
+          top: height * 0.2,
+          bottom: height * 0.1,
           left: width* 0.15,
           right: width * 0.05
         };
@@ -314,14 +396,6 @@ const makeLineGraph = function(data){
  var otherLinesOpacityHover = "0.1";
  var lineStroke = "1.5px";
  var lineStrokeHover = "2.5px";
- //
- // // var parseDate = d3.timeParse("%Y");
- // data.forEach(function(d) {
- //   d.years.forEach(function(d) {
- //     d.year = d.year;
- //     d.yearData = +d.yearData.length;
- //   });
- // });
 
  var xScale = d3.scaleLinear()
                 // .domain([lowerBound, upperBound])
@@ -415,6 +489,11 @@ const makeHeatGraph = function(data){
           .attr("width", width)
           .attr("height", height)
           .attr("class", "heatchart");
+
+
+
+
+
   hOptions = d3.select("body")
                 .append("div")
                 .attr("width", width)
@@ -529,7 +608,7 @@ const findMax = function(data){
       // console.log(data[key])
 
       yearData = data[key].years
-      console.log(yearData)
+      // console.log(yearData)
       var genreMax = d3.max(yearData, function(d){
                                  return d.yearData.length;
                                  });
@@ -537,6 +616,6 @@ const findMax = function(data){
           max = genreMax
       }
     }
-    console.log(max)
+    // console.log(max)
     return max
 }
