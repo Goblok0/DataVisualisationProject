@@ -16,10 +16,12 @@ window.onload = function() {
         // barDataGenres = data[0][0]
         barData = data[0]
         lineData = data[1]
+        heatData = data[2]
         // console.log(data[0][1])
         makeBarGraph(barData)
         makeLineGraph(lineData)
-        makeHeatGraph()
+        makeHeatGraph(heatData)
+        placeOptions()
 
     }).catch(function(e){
              throw(e);
@@ -167,14 +169,14 @@ const preLineData = function(data){
         // lineDataDict[]
         lineData.push(lineDataDict)
     };
-    console.log(lineData)
+    // console.log(lineData)
 
     return lineData
 
 }
 
 const preHeatData = function(data){
-    console.log(data)
+    // console.log(data)
     // console.log(data)
     genreDict = {}
 
@@ -221,7 +223,7 @@ const preHeatData = function(data){
             }
         }
     }
-    console.log(genreDict)
+    // console.log(genreDict)
     genreList = []
     for (genre of Object.keys(genreDict)){
         inGenre = genreDict[genre]
@@ -233,17 +235,21 @@ const preHeatData = function(data){
                 if (season == "Winter"){
                     heatEntry["season"] = 1
                 }
-                if (season == "Spring"){
+                else if (season == "Spring"){
                    heatEntry["season"] = 2
                 }
-                if (season == "Summer"){
+                else if (season == "Summer"){
                    heatEntry["season"] = 3
                 }
-                if (season == "Fall"){
+                else {
                    heatEntry["season"] = 4
                 }
+                // else (season == "Fall"){
+                //    heatEntry["season"] = 4
+                // }
                 heatEntry["year"] = year
-                heatEntry["value"] = inYear[season]
+                // console.log(inYear[season])
+                heatEntry["amount"] = inYear[season]
                 genreList.push(heatEntry)
               }
 
@@ -284,32 +290,7 @@ const makeBarGraph = function(data){
                 .attr("width", width)
                 .attr("height", height)
                 .attr("class", "barchart");
-    bOptions = d3.select("body")
-                .append("div")
-                .attr("width", width)
-                .attr("height", height)
-                .attr("class", "baroptions");
-    var testData = ["Genres","Studio"]
-    barData = bOptions.selectAll("inputBD")
-                     .data(testData)
-                     .enter()
-                     .append("label")
-                     .text(function(d){return d})
-                     .append("input")
-                     .attr("type", "radio")
-                     .attr("name", "box1")
-                     .attr("value", function(d){
-                                    return d
-                     })
-     barType = bOptions.selectAll("inputBT")
-                      .data(["Big Data", "Small Data"])
-                      .enter()
-                      .append("label")
-                      .text(function(d){return d})
-                      .append("input")
-                      .attr("type", "radio")
-                      .attr("name", "BarType")
-                      .attr("value", function(d){return d})
+
 
     // creates the background of the SVG-element
     svg.append("rect")
@@ -327,7 +308,7 @@ const makeBarGraph = function(data){
                                 return d[1];
                                 });
 
-    console.log(max)
+    // console.log(max)
 
      yScale = d3.scaleBand()
                 .range([height - pad.bottom, pad.top])
@@ -361,7 +342,7 @@ const makeBarGraph = function(data){
 }
 
 const makeLineGraph = function(data){
-  console.log(data)
+  // console.log(data)
   // console.log(data.Action)
   // data = data.Action
   var width = 600;
@@ -381,8 +362,8 @@ const makeLineGraph = function(data){
   lowerBound = slideValue - 10
   upperBound = slideValue + 10
 
-  max = findMax(data)
-  console.log(max)
+  max = findLineMax(data)
+  // console.log(max)
 
   svg = d3.select("body")
           .append("svg")
@@ -443,46 +424,25 @@ const makeLineGraph = function(data){
      .call(yAxis);
 
 
-     lOptions = d3.select("body")
-                 .append("div")
-                 .attr("width", width)
-                 .attr("height", height)
-                 .attr("class", "lineoptions");
 
-
-  var testData = ["genre1","genre2","genre3","genre4"]
-  labels = lOptions.selectAll("input")
-                   .data(testData)
-                   .enter()
-                   .append("label")
-                   .text(function(d){return d})
-                   .append("input")
-                   .attr("type", "checkbox")
-                   .attr("name", "box1")
-                   .attr("value", "MEH")
-
-   lOptions.append("label")
-            .text("Show all years")
-            .append("input")
-            .attr("type", "submit")
-            .attr("name", "lineAllYears")
-            .attr("value", "MEH")
 
 
 }
 const makeHeatGraph = function(data){
+  console.log(data)
   var width = 600;
   var height = 400;
 
   pad = {
-    top: height * 0.1,
-    bottom: height * 0.2,
+    top: height * 0.5,
+    bottom: height * 0.3,
     left: width* 0.15,
-    right: width * 0.05
+    right: width * 0.1
   };
 
   var wChart = width - pad.left - pad.right;
   var hChart = height - pad.bottom - pad.top;
+
 
   svg = d3.select("body")
           .append("svg")
@@ -490,56 +450,112 @@ const makeHeatGraph = function(data){
           .attr("height", height)
           .attr("class", "heatchart");
 
+  var yList = ["Winter", "Spring", "Summer", "Fall"]
+
+  yearRange = Array.from(new Array(33), (x,i) => i + 1986)
+  // console.log(yearRange)
+
+  gridWidth = Math.floor(wChart / yearRange.length)
+  gridHeight = gridWidth * (yList.length + 2)
+  fontSize = gridWidth * 62.5 / 900
+
+
+		//  .attr("transform", "translate(-6," + gridWidth / 1.5 + ")")
+
+   // console.log(data)
+   // data.forEach(function(d){
+   //      d.season = +d.season
+   //      d.year = +d.year
+   //      d.amount = +d.amount
+   // })
+   // console.log(data)
+
+   // group data by genre
+   // kan binnen preprocessing
+    var nest = d3.nest()
+                      .key(function(d) { return d.genre; })
+                      .entries(data);
+    // console.log(nest)
+    var genres = nest.map(function(d) { return d.key; });
+    var currentGenreIndex = "Comedy";
+
+    var max = d3.max(data, function(d){
+                              return d.amount.length;
+                              });
+    console.log(max)
+
+    var xScale = d3.scaleLinear()
+                   // .domain([lowerBound, upperBound])
+                   .domain([1986, 2018])
+                   .range([pad.left, width - pad.right])
+    var yScale = d3.scaleLinear()
+                     .domain([0, 4])
+                     .range([height - pad.bottom, pad.top]);
+    var colScale = d3.scaleLinear()
+                    .domain([0, max-3])
+                    .range([50, 255]);
+
+    var selectGenre = nest.find(function(d) {
+                                              return d.key == currentGenreIndex;
+                                            });
+
+    var heatmap = svg.selectAll(".heatYear")
+      .data(selectGenre.values)
+      .enter()
+      .append("rect")
+      .attr("x", function(d) {
+                                var xValue = xScale(d.year)
+                                return xValue
+                              })
+      .attr("y", function(d) {
+                                var yValue = yScale(d.season)
+                                return yValue
+                              })
+      // .attr("class", "hour bordered")
+      .attr("width", gridWidth)
+      .attr("height", gridWidth)
+      .style("stroke", "white")
+      .style("stroke-opacity", 0.6)
+      .style("fill", function(d) {
+                                  // console.log(d.amount.length)
+                                  var colValue = colScale(d.amount.length)
+                                  // console.log(d.amount.length)
+                                  // console.log(colValue)
+                                  var colour = `rgb(0,0,${colValue})`
+                                  // console.log(colour)
+                                  if (d.amount.length == 0){
+                                      colour = "darkgrey"
+                                  }
+                                  // var colour = "blue"
+                                  return colour; })
+
+    var yLabels = svg.selectAll(".heatYLabel")
+   	 .data(yearRange)
+   	 .enter()
+   	 .append("text")
+   	 .text(function(d) {
+       // console.log(d)
+       return d; })
+   	 .attr("x", function(d,i){
+           var xCoor = xScale(i + 1986) // i + lowerbound
+           return xCoor
+           })
+   	 .attr("y", pad.top * 0.9)
+     .style("font-size", "10px")
+   	 .style("text-anchor", "center")
+
+    svg.selectAll(".heatYlabel")
+         .attr("y", 0)
+         .attr("x", 0)
+         .attr("dy", ".35em")
+         .attr("transform", "rotate(10)")
+         .style("text-anchor", "start");
 
 
 
+   addSlider(svg, height)
 
-  hOptions = d3.select("body")
-                .append("div")
-                .attr("width", width)
-                .attr("height", height)
-                .attr("class", "heatoptions");
 
-  var valueElement = svg.append("div")
-                      .attr("class", "col-sm-2")
-                      .append("p")
-                      .attr("id", "value-time")
-  var slideElement = svg.append("div")
-                      .attr("class", "col-sm")
-                      .append("p")
-                      .attr("id", "slider-time")
-
-  // Time
-  var dataTime = d3.range(0, 12).map(function(d) {
-    return new Date(1996 + d, 10, 3);
-  });
-
-  var sliderTime = d3
-    .sliderBottom()
-    .min(d3.min(dataTime))
-    .max(d3.max(dataTime))
-    .step(1000 * 60 * 60 * 24 * 365)
-    .width(300)
-    .tickFormat(d3.timeFormat('%Y'))
-    .tickValues(dataTime)
-    .default(new Date(1998, 10, 3))
-    .on('onchange', val => {
-      valueElement.text(d3.timeFormat('%Y')(val));
-      console.log(val)
-    });
-
-  var gTime = svg
-    .append('svg')
-    .attr('width', 500)
-    .attr('height', 100)
-    .attr("x", pad.left)
-    .attr("y", height - 100)
-    .append('g')
-    .attr('transform', 'translate(50,50)');
-
-  gTime.call(sliderTime);
-
-  valueElement.text(d3.timeFormat('%Y')(sliderTime.value()));
 
 
   // set scaler for alpha colour
@@ -584,7 +600,7 @@ const makeHeatGraph = function(data){
                      })
           .attr("fill", function(d) {
                         var colValue = colScale(d[0]);
-                        var colour = `rgba(255,0,0,${colValue})`;
+                        var colour = `rgba(50,0,255,${colValue})`;
                         return colour;
                         });
     // creates the description beloning to each square symbol in the legend
@@ -600,10 +616,77 @@ const makeHeatGraph = function(data){
 
 
 }
+const placeOptions = function(){
+  var width = 600;
+  var height = 400;
 
-const findMax = function(data){
+  pad = {
+    top: height * 0.1,
+    bottom: height * 0.2,
+    left: width* 0.15,
+    right: width * 0.05
+  };
+
+  bOptions = d3.select("body")
+              .append("div")
+              .attr("width", width)
+              .attr("height", height)
+              .attr("class", "baroptions");
+  var testData = ["Genres","Studio"]
+  barData = bOptions.selectAll("inputBD")
+                   .data(testData)
+                   .enter()
+                   .append("label")
+                   .text(function(d){return d})
+                   .append("input")
+                   .attr("type", "radio")
+                   .attr("name", "box1")
+                   .attr("value", function(d){
+                                  return d
+                   })
+   barType = bOptions.selectAll("inputBT")
+                    .data(["Big Data", "Small Data"])
+                    .enter()
+                    .append("label")
+                    .text(function(d){return d})
+                    .append("input")
+                    .attr("type", "radio")
+                    .attr("name", "BarType")
+                    .attr("value", function(d){return d})
+  lOptions = d3.select("body")
+              .append("div")
+              .attr("width", width)
+              .attr("height", height)
+              .attr("class", "lineoptions");
+
+
+ var testData = ["genre1","genre2","genre3","genre4"]
+ labels = lOptions.selectAll("input")
+                  .data(testData)
+                  .enter()
+                  .append("label")
+                  .text(function(d){return d})
+                  .append("input")
+                  .attr("type", "checkbox")
+                  .attr("name", "box1")
+                  .attr("value", "MEH")
+
+  lOptions.append("label")
+           .text("Show all years")
+           .append("input")
+           .attr("type", "submit")
+           .attr("name", "lineAllYears")
+           .attr("value", "MEH")
+
+  hOptions = d3.select("body")
+                .append("div")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("class", "heatoptions");
+}
+const findLineMax = function(data){
     max = 0
-    console.log(data)
+    // console.log(data)
     for (key of Object.keys(data)){
       // console.log(data[key])
 
@@ -618,4 +701,46 @@ const findMax = function(data){
     }
     // console.log(max)
     return max
+}
+const addSlider = function(svg, height){
+  var valueElement = svg.append("div")
+                      .attr("class", "col-sm-2")
+                      .append("p")
+                      .attr("id", "value-time")
+  var slideElement = svg.append("div")
+                      .attr("class", "col-sm")
+                      .append("p")
+                      .attr("id", "slider-time")
+
+  // Time
+  var dataTime = d3.range(0, 12).map(function(d) {
+    return new Date(1996 + d, 10, 3);
+  });
+
+  var sliderTime = d3
+    .sliderBottom()
+    .min(d3.min(dataTime))
+    .max(d3.max(dataTime))
+    .step(1000 * 60 * 60 * 24 * 365)
+    .width(300)
+    .tickFormat(d3.timeFormat('%Y'))
+    .tickValues(dataTime)
+    .default(new Date(1998, 10, 3))
+    .on('onchange', val => {
+      valueElement.text(d3.timeFormat('%Y')(val));
+      // console.log(val)
+    });
+
+  var gTime = svg
+    .append('svg')
+    .attr('width', 500)
+    .attr('height', 100)
+    .attr("x", pad.left)
+    .attr("y", height - 100)
+    .append('g')
+    .attr('transform', 'translate(50,50)');
+
+  gTime.call(sliderTime);
+
+  valueElement.text(d3.timeFormat('%Y')(sliderTime.value()));
 }

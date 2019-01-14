@@ -34,3 +34,10 @@
 # day 5.6(Sunday)
  * Data voor de heatmap is geordend op een manier dat bruikbaar is voor de season-heatmap
  * elke chartdata is opgezet voor de genres, maar nog niet voor de studios, ten eerste zijn de genres neezetten belangrijker omdat het waarschijnlijk interessanter is voor de gebruiker. Maar studio zal uiteinderlijk worden opgezet
+
+# day 6
+ * heb de key voor value veranderd naar amount bij het preprocessen van de heatData omdat JS een numerieke waarde verwacht bij zo'n key
+    * het vreemde is dat d3.max dan alsnog de correcte max kan vinden van een 0/NaN lijst
+ * note to self: studios gaat sws niet de heatmap in, aangezien het geen interessante data zal representeren aangezien studios alleen maar een of twee releases hebben per seizoen
+ * heatmap blokjes zijn geplaats, voor nu alle jaren ipv een segment, net als bij de line chart
+   * een knop voor alle jaren zou interessant kunnen zijn, maar dat zou problematisch worden voor de jaren-labels
