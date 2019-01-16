@@ -661,10 +661,7 @@ const updateHeat = function(selVar){
       left: width* 0.15,
       right: width * 0.1
     };
-
-    timeValue = 2007
-    lowerBound = timeValue - 5
-    upperBound = timeValue + 5
+    
     var yList = ["Winter", "Spring", "Summer", "Fall"]
 
     var max = d3.max(data, function(d){
@@ -899,7 +896,7 @@ const addSlider = function(svg, height){
     .width(300)
     .tickFormat(d3.timeFormat('%Y'))
     .tickValues(dataTime)
-    .default(new Date(2007, 10, 3))
+    .default(new Date(1998, 10, 3))
     .on('onchange', val => {
       valueElement.text(d3.timeFormat('%Y')(val));
       updateHeat()

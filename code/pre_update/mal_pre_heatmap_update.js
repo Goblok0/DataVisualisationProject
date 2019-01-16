@@ -578,12 +578,111 @@ const makeHeatGraph = function(data){
     right: width * 0.1
   };
 
+  var wChart = width - pad.left - pad.right;
+  var hChart = height - pad.bottom - pad.top;
+
+
   svg = d3.select("body")
           .append("svg")
           .attr("width", width)
           .attr("height", height)
           .attr("class", "heatchart");
   svgGlob.push(svg)
+  var yList = ["Winter", "Spring", "Summer", "Fall"]
+
+  yearRange = Array.from(new Array(33), (x,i) => i + 1986)
+  // console.log(yearRange)
+
+  gridWidth = Math.floor(wChart / yearRange.length)
+  gridHeight = gridWidth * (yList.length + 2)
+  fontSize = gridWidth * 62.5 / 900
+
+   // group data by genre
+   // kan binnen preprocessing
+
+    console.log(max)
+
+    var xScale = d3.scaleLinear()
+                   // .domain([lowerBound, upperBound])
+                   .domain([1986, 2018])
+                   .range([pad.left, width - pad.right])
+    var yScale = d3.scaleLinear()
+                     .domain([0, yList.length])
+                     .range([pad.top, height-pad.bottom]);
+    var colScale = d3.scaleLinear()
+                    .domain([0, 10])
+                    .range([50, 255]);
+
+    var nest = d3.nest()
+                      .key(function(d) { return d.genre; })
+                      .entries(data);
+
+    var genres = nest.map(function(d) { return d.key; });
+    var currentGenreIndex = "Comedy";
+    var selectGenre = nest.find(function(d) {
+                                              return d.key == currentGenreIndex;
+                                            });
+
+    var max = d3.max(data, function(d){
+                              return d.amount.length;
+                              });
+
+    var heatmap = svg.selectAll(".heatYear")
+      .data(selectGenre.values)
+      .enter()
+      .append("rect")
+      .attr("x", function(d) {
+                                var xValue = xScale(d.year)
+                                return xValue
+                              })
+      .attr("y", function(d) {
+                                var yValue = yScale(d.season - 1)
+                                return yValue
+                              })
+      // .attr("class", "hour bordered")
+      .attr("width", gridWidth)
+      .attr("height", gridWidth)
+      .attr("class", "heatYear")
+      .style("stroke", "white")
+      .style("stroke-opacity", 0.6)
+      .style("fill", function(d) {
+                                  var colValue = colScale(d.amount.length)
+                                  var colour = `rgb(0,0,${colValue})`
+                                  if (d.amount.length == 0){
+                                      colour = "darkgrey"
+                                  }
+                                  return colour; })
+
+    var xLabels = svg.selectAll(".heatXLabel")
+   	 .data(yearRange)
+   	 .enter()
+   	 .append("text")
+   	 .text(function(d) {
+       // console.log(d)
+       return d; })
+   	 .attr("x", function(d,i){
+           var xCoor = xScale(i + 1986) // i + lowerbound
+           return xCoor
+           })
+   	 .attr("y", pad.top * 0.9)
+     .style("font-size", "10px")
+   	 .style("text-anchor", "center")
+
+   var yLabels = svg.selectAll(".heatYLabel")
+    .data(yList)
+    .enter()
+    .append("text")
+    .text(function(d) {
+      // console.log(d)
+      return d; })
+    .attr("x", pad.left * 0.9)
+    .attr("y", function(d,i){
+               var yCoor = yScale(i) + 7
+               return yCoor
+               })
+    .style("font-size", "10px")
+    .style("text-anchor", "end")
+
    addSlider(svg, height)
 
 
@@ -646,173 +745,12 @@ const makeHeatGraph = function(data){
                   });
   }
   makeHeatLegend()
-  updateHeat("Comedy")
 
 }
 const updateHeat = function(selVar){
     svg = d3.select(".heatChart")
-    data = dataGlob[2]
-
-    var width = parseInt(svg.style("width"));
-    var height = parseInt(svg.style("height"));
-    pad = {
-      top: height * 0.2,
-      bottom: height * 0.4,
-      left: width* 0.15,
-      right: width * 0.1
-    };
-
-    timeValue = 2007
-    lowerBound = timeValue - 5
-    upperBound = timeValue + 5
-    var yList = ["Winter", "Spring", "Summer", "Fall"]
-
-    var max = d3.max(data, function(d){
-                              return d.amount.length;
-                              });
-    var xScale = d3.scaleLinear()
-                   .domain([1986, 2018])
-                   // .domain([lowerBound, upperBound])
-                   .range([pad.left, width - pad.right])
-    var yScale = d3.scaleLinear()
-                   .domain([0, yList.length])
-                   .range([pad.top, height-pad.bottom]);
-
-    var wChart = width - pad.left - pad.right;
-    var hChart = height - pad.bottom - pad.top;
     console.log(selVar)
-    yearRange = Array.from(new Array(33), (x,i) => i + 1986)
-    // console.log(yearRange)
-
-    gridWidth = Math.floor(wChart / yearRange.length)
-    gridHeight = gridWidth * (yList.length + 2)
-    fontSize = gridWidth * 62.5 / 900
-
-    const placeYLabels = function(){
-
-        var yLabels = svg.selectAll(".heatYLabel")
-         .data(yList)
-         .enter()
-         .append("text")
-         .text(function(d) {
-           // console.log(d)
-           return d; })
-         .attr("x", pad.left * 0.9)
-         .attr("y", function(d,i){
-                    var yCoor = yScale(i) + 7
-                    return yCoor
-                    })
-         .style("font-size", "10px")
-         .style("text-anchor", "end")
-    }
-    placeYLabels()
-    var xLabels = svg.selectAll(".heatXLabel")
-   	 .data(yearRange)
-   	 .enter()
-   	 .append("text")
-   	 .text(function(d) {
-       // console.log(d)
-       return d; })
-   	 .attr("x", function(d,i){
-           var xCoor = xScale(i + 1986) // i + lowerbound
-           return xCoor
-           })
-   	 .attr("y", pad.top * 0.9)
-     .style("font-size", "10px")
-   	 .style("text-anchor", "center")
-
-
-    // when studios
     var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
-
-
-    var nest = d3.nest()
-                      .key(function(d) { return d.genre; })
-                      .entries(data);
-
-    var genres = nest.map(function(d) { return d.key; });
-    // var currentGenreIndex = "Comedy";
-    var selectGenre = nest.find(function(d) {
-                                              return d.key == selVar;
-                                            });
-
-    var colScale = d3.scaleLinear()
-                    .domain([0, 10])
-                    .range([50, 255]);
-
-    var heatmap = svg.selectAll(".heatYear")
-      .data(selectGenre.values)
-      .enter()
-      .append("rect")
-      .attr("x", function(d) {
-                                var xValue = xScale(d.year)
-                                return xValue
-                              })
-      .attr("y", function(d) {
-                                var yValue = yScale(d.season - 1)
-                                return yValue
-                              })
-      // .attr("class", "hour bordered")
-      .attr("width", gridWidth)
-      .attr("height", gridWidth)
-      .attr("class", "heatYear")
-      .style("stroke", "white")
-      .on("mouseover", function(d) {
-                       d3.select(this)
-                         .style("opacity", 0.5);
-                       })
-      .on("mouseout", function(d) {
-                      d3.select(this)
-                        .style("opacity", 1.0);
-                      })
-      // .style("stroke-opacity", 0.6)
-      .style("fill", function(d) {
-                                  var colValue = colScale(d.amount.length)
-                                  var colour = `rgb(0,0,${colValue})`
-                                  if (d.amount.length == 0){
-                                      colour = "darkgrey"
-                                  }
-                                  return colour; })
-      .on("click", function(d){
-                   updateAgenda(d.amount)
-                   });
-
-      var heatmap = svg.selectAll(".heatYear")
-                       .data(selectGenre.values)
-                       .transition()
-                       .duration(500)
-                       .style("fill", function(d) {
-                                      var colValue = colScale(d.amount.length)
-                                      var colour = `rgb(0,0,${colValue})`
-                                      if (d.amount.length == 0){
-                                          colour = "darkgrey"
-                                      }
-                                      return colour;
-                                      })
-
-}
-const updateAgenda = function(entries){
-    svg = d3.select(".agenda")
-    // svg.attr("height", function(d){
-    //                    var agendaHeight = 10 * entries.length
-    //                    return agendaHeight
-    //                    })
-    console.log(entries)
-    svg.selectAll(".agendaEntry")
-					.remove()
-					.exit()
-
-      svg.transition().duration(1000)
-         .attr("height", function(d){
-                           var agendaHeight = 10 * entries.length
-                           return agendaHeight
-                           })
-    for (entry of entries){
-      svg.append("p")
-        .text(entry)
-        .attr("class", "agendaEntry");
-    }
-
 
 }
 const placeOptions = function(){
@@ -856,7 +794,7 @@ const placeOptions = function(){
                 .append("div")
                 .attr("width", width)
                 .attr("height", height)
-                .attr("class", "agenda");
+                .attr("class", "heatoptions");
 }
 const findLineMax = function(data){
     max = 0
@@ -899,10 +837,10 @@ const addSlider = function(svg, height){
     .width(300)
     .tickFormat(d3.timeFormat('%Y'))
     .tickValues(dataTime)
-    .default(new Date(2007, 10, 3))
+    .default(new Date(1998, 10, 3))
     .on('onchange', val => {
       valueElement.text(d3.timeFormat('%Y')(val));
-      updateHeat()
+      // console.log(val)
     });
 
   var gTime = svg

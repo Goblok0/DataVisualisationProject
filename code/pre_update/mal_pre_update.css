@@ -1,16 +1,6 @@
 body{
   background-color: lightskyblue
 }
-div.lowText {
-  position: absolute;
-  top: 1500;
-  left: 500;
-  width: 150px;
-  padding: 5px;
-  font-size: 10px;
-  background-color: powderblue;
-  border: 2px solid black;
-}
 div.sticky {
   position: sticky;
   top: 20;
@@ -92,13 +82,12 @@ svg.heatchart{
   background-color: lightblue;
   border: 2px solid black;
 }
-div.agenda{
+div.heatoptions{
   position: absolute;
   top: 1050px;
   left: 850px;
   width: 300px;
-  /* height: 200px; */
-  color: #ffc499;
+  height: 200px;
   padding: 5px;
   background-color: blue;
   border: 2px solid black;

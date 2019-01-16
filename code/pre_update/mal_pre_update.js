@@ -24,7 +24,6 @@ window.onload = function() {
         makeHeatGraph(heatData)
         placeOptions()
 
-
     }).catch(function(e){
              throw(e);
              });
@@ -51,42 +50,18 @@ const preBarData = function(data){
             genreDict[genre]++
         }
         for (studio of variable[9]){
-            if (studio.includes(",")){
-                studio = studio.split(",")
-                for(inStudio of studio){
-                  inStudio = inStudio.trim()
-                  if (!(studioDict[inStudio])){
-                     studioDict[inStudio] = 0
-                  }
-                  studioDict[inStudio]++
-                }
+            if (!(studioDict[studio])){
+               studioDict[studio] = 0
             }
-            else{
-              if (!(studioDict[studio])){
-                 studioDict[studio] = 0
-              }
-              studioDict[studio]++
-            }
-
+            studioDict[studio]++
         }
     };
     // console.log(genreDict)
     // console.log(studioDict)
-
-    // studioMean = d3.mean(selectedData,function(d) { return +d.reading})
-    // genreMean = d3.mean(selectedData,function(d) { return +d.reading})
-
     smallGenreList = []
     bigGenreList = []
     smallStudioList = []
     bigStudioList = []
-
-    genreMedian = d3.median(Object.values(genreDict))
-    studioMedian = d3.median(Object.values(studioDict))
-    if (studioMedian < 4){
-        studioMedian = studioMedian + 2
-    }
-    // console.log([genreMedian, studioMedian])
 
     for (let key of Object.keys(genreDict)){
         // entryDict = {}
@@ -95,7 +70,7 @@ const preBarData = function(data){
         if (key == "unknown"){
           continue
         }
-        if (parseInt(genreDict[key]) < genreMedian){
+        if (parseInt(genreDict[key]) < 50){
             smallGenreList.push([key,genreDict[key]]);
         }
         else {
@@ -110,7 +85,7 @@ const preBarData = function(data){
         if (key == "unknown"){
           continue
         }
-        if (parseInt(studioDict[key]) < studioMedian){
+        if (parseInt(studioDict[key]) < 10){
             smallStudioList.push([key,studioDict[key]]);
         }
         else {
@@ -281,16 +256,18 @@ const preHeatData = function(data){
 
             }
         }
-    // console.log(genreList)
+    console.log(genreList)
     return genreList
 }
 
 const makeBarGraph = function(data){
 
-    // data = data[1]
-    // // pick bigBardata temporarily
-    // data = data[0]
-
+    data = data[0]
+    // pick bigBardata temporarily
+    data = data[0]
+    data.sort(function(a, b) {
+              return d3.ascending(a[1], b[1])
+              })
 
     // defines the size of the SVG
     var width = 600;
@@ -314,7 +291,6 @@ const makeBarGraph = function(data){
                 .attr("width", width)
                 .attr("height", height)
                 .attr("class", "barchart");
-    // not needed
     svgGlob.push(svg)
 
     // creates the background of the SVG-element
@@ -323,132 +299,28 @@ const makeBarGraph = function(data){
        .attr("height", "100%")
        .attr("fill", "grey")
        .attr("opacity", 0.1);
-     //
-     // data = dataGlob[0][0][0]
-     //
-     // data.sort(function(a, b) {
-     //           return d3.ascending(a[1], b[1])
-     //           })
-     // // isolates the lowest data value from the data
-     // var min = d3.min(data, function(d){
-     //                            return d[1];
-     //                            });
-     // // isolates the highest data value from the data
-     // var max = d3.max(data, function(d){
-     //                            return d[1];
-     //                            });
+
+     // isolates the lowest data value from the data
+     var min = d3.min(data, function(d){
+                                return d[1];
+                                });
+     // isolates the highest data value from the data
+     var max = d3.max(data, function(d){
+                                return d[1];
+                                });
+
+    // console.log(max)
 
      yScale = d3.scaleBand()
                 .range([height - pad.bottom, pad.top])
      xScale = d3.scaleLinear()
                 .range([pad.left, width - pad.right])
-      // yScale.domain(data.map(function(d){
-      //                         return d[0]
-      //                         }))
-      // xScale.domain([min - 1, max])
 
-    // add the x Axis
-    var barXAxis = svg.append("g")
-                      .attr("transform", "translate(" + 0 + "," + height * 0.9 + ")")
-                      .attr("class", "barYAxis")
-                      .call(d3.axisBottom(xScale));
+     yScale.domain(data.map(function(d){
+                             return d[0]
+                             }))
+     xScale.domain([45, max])
 
-    // add the y Axis
-    var barYAxis = svg.append("g")
-                      .attr("transform", "translate(" + pad.left * 0.9 + "," + 0+ ")")
-                      .attr("class", "barXAxis")
-                      .call(d3.axisLeft(yScale));
-
-    const addOptions = function(){
-      bOptions = d3.select("body")
-                  .append("div")
-                  .attr("width", width)
-                  .attr("height", height)
-                  .attr("class", "baroptions");
-
-      barData = bOptions.selectAll("inputBD")
-                       .data(["Genres","Studio"])
-                       .enter()
-                       .append("label")
-                       .text(function(d){return d})
-                       .append("input")
-                       .attr("type", "radio")
-                       .attr("name", "barData")
-                       .attr("value", function(d, i){
-                                      return i
-                       })
-                       .property("checked", function(d) {return d==="Genres";})
-                       .on("click", function(d){
-                                    updateBars()
-                                    });
-
-       barType = bOptions.selectAll("inputBT")
-                        .data(["Big Data", "Small Data"])
-                        .enter()
-                        .append("label")
-                        .text(function(d){return d})
-                        .append("input")
-                        .attr("type", "radio")
-                        .attr("name", "barType")
-                        .attr("value", function(d,i){return i})
-                        .property("checked", function(d) {return d==="Big Data";})
-                        .on("click", function(d){
-                                     updateBars()
-                                     });
-    }
-
-    addOptions()
-    updateBars()
-}
-const updateBars = function(){
-    svg = d3.select(".barchart")
-    var width = parseInt(svg.style("width"));
-    var height = parseInt(svg.style("height"));
-
-    // console.log([width, height])
-    pad = {
-      top: height * 0.1,
-      bottom: height * 0.1,
-      left: width * 0.2,
-      right: width * 0.05
-    };
-
-    try{
-      var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
-      var typeVar = parseInt(d3.select('input[name="barType"]:checked').node().value);
-    }
-    catch (err){
-        // alert("MEH")
-        var dataVar = 0
-        var typeVar = 0
-    }
-    //
-
-    data = dataGlob[0][dataVar][typeVar]
-
-    data.sort(function(a, b) {
-              return d3.ascending(a[1], b[1])
-              })
-    // isolates the lowest data value from the data
-    var min = d3.min(data, function(d){
-                               return d[1];
-                               });
-    // isolates the highest data value from the data
-    var max = d3.max(data, function(d){
-                               return d[1];
-                               });
-
-    // console.log([min, max])
-    yScale.domain(data.map(function(d){
-                            return d[0]
-                            }))
-    xScale.domain([min - 1, max])
-
-    var rects = svg.selectAll("rect")
-          .data(data)
-					.remove()
-					.exit()
-					.data(data)
 
     var rects = svg.selectAll("rect")
                    .data(data)
@@ -457,32 +329,21 @@ const updateBars = function(){
                    .attr("y", function(d) {return yScale(d[0]);})
                    .attr("x", pad.left)
                    .attr("width", function(d) {return xScale(d[1]) - pad.left;})
-                   .attr("height", yScale.bandwidth() * 0.9)
-                   .on("mouseover", function(d) {
-                                    d3.select(this)
-                                      .style("opacity", 0.5);
-                                    })
-                   .on("mouseout", function(d) {
-                                   d3.select(this)
-                                     .style("opacity", 1.0);
-                                   })
-                   .on("click", function(d){
-                                updateHeat(d[0])
-                                });
-    // https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe
-    svg.selectAll("rect")
-       .data(data)
-       .transition().duration(1000)
-       .attr("y", function(d) {return yScale(d[0]);})
-       .attr("x", pad.left)
-       .attr("width", function(d) {return xScale(d[1]) - pad.left;})
-       .attr("height", yScale.bandwidth() * 0.9)
+                   .attr("height", yScale.bandwidth() * 0.9);
 
-    svg.select(".barYAxis")
-       .call(yScale)
-    svg.select(".barXAxis")
-       .call(xScale)
+    // add the x Axis
+    svg.append("g")
+        .attr("transform", "translate(" + 0 + "," + height * 0.9 + ")")
+        .call(d3.axisBottom(xScale));
+
+    // add the y Axis
+    svg.append("g")
+        .attr("transform", "translate(" + pad.left * 0.9 + "," + 0+ ")")
+        .call(d3.axisLeft(yScale));
 }
+// const updateBars = function(data, svg){
+//     console.log("MEH")
+// }
 
 const makeLineGraph = function(data){
   // console.log(data)
@@ -565,9 +426,14 @@ const makeLineGraph = function(data){
      .attr("transform", "translate("+ (pad.left) + ","
                                     + 0 + ")")
      .call(yAxis);
+
+
+
+
+
 }
 const makeHeatGraph = function(data){
-  // console.log(data)
+  console.log(data)
   var width = 600;
   var height = 400;
 
@@ -578,167 +444,64 @@ const makeHeatGraph = function(data){
     right: width * 0.1
   };
 
+  var wChart = width - pad.left - pad.right;
+  var hChart = height - pad.bottom - pad.top;
+
+
   svg = d3.select("body")
           .append("svg")
           .attr("width", width)
           .attr("height", height)
           .attr("class", "heatchart");
   svgGlob.push(svg)
-   addSlider(svg, height)
+  var yList = ["Winter", "Spring", "Summer", "Fall"]
+
+  yearRange = Array.from(new Array(33), (x,i) => i + 1986)
+  // console.log(yearRange)
+
+  gridWidth = Math.floor(wChart / yearRange.length)
+  gridHeight = gridWidth * (yList.length + 2)
+  fontSize = gridWidth * 62.5 / 900
 
 
-  const makeHeatLegend = function(){
-    // set scaler for alpha colour
-    var colScale = d3.scaleLinear()
-                     .domain([0, 250])
-                     .range([50, 255]);
-    // makes legend data for the chloropleth map
-    var legData = [[0, "<5 watched"],
-                   [100, "5-10 watched"],
-                   [250, "+10 watched"]]
-    // creates legend element
-    var legend = svg.selectAll(".legend")
-                    .data(legData)
-                    .enter()
-                    .append("g")
-                    .attr("class", "legend")
-                    .attr("transform", function(d,i) {
-                                       var legX = 500
-                                       var legY = 300
-                                       return "translate(" + legX + ","
-                                                           + legY + ")"
-                                       })
-                    .style("font-size","10px");
-    // creates the background for the legend
-    legend.append('rect')
-          .attr('width', 400)
-          .attr('height', legData.length * 20)
-          .attr("x", 0)
-          .attr("y", -20)
-          .style('fill', "white")
-          .attr("opacity", 0.2)
-          .style('stroke', "black");
+		//  .attr("transform", "translate(-6," + gridWidth / 1.5 + ")")
 
-      // creates the square-colour symbol in the legend
-      legend.append("rect")
-            .attr('width', 50)
-            .attr('height', 20)
-            .attr('x', 10)
-            .attr('y', function(d,i){
-                       var y = i * 15 - 15;
-                       return y;
-                       })
-            .attr("fill", function(d) {
-                          var colValue = colScale(d[0]);
-                          console.log(colValue)
-                          var colour = `rgb(0,0,${colValue})`;
-                          return colour;
-                          });
-      // creates the description beloning to each square symbol in the legend
-      legend.append('text')
-            .attr('x', 70)
-            .attr('y', function(d,i){
-                       var y = i * 15;
-                       return y;
-                       })
-            .text(function(d){
-                  return d[1];
-                  });
-  }
-  makeHeatLegend()
-  updateHeat("Comedy")
+   // console.log(data)
+   // data.forEach(function(d){
+   //      d.season = +d.season
+   //      d.year = +d.year
+   //      d.amount = +d.amount
+   // })
+   // console.log(data)
 
-}
-const updateHeat = function(selVar){
-    svg = d3.select(".heatChart")
-    data = dataGlob[2]
-
-    var width = parseInt(svg.style("width"));
-    var height = parseInt(svg.style("height"));
-    pad = {
-      top: height * 0.2,
-      bottom: height * 0.4,
-      left: width* 0.15,
-      right: width * 0.1
-    };
-
-    timeValue = 2007
-    lowerBound = timeValue - 5
-    upperBound = timeValue + 5
-    var yList = ["Winter", "Spring", "Summer", "Fall"]
+   // group data by genre
+   // kan binnen preprocessing
+    var nest = d3.nest()
+                      .key(function(d) { return d.genre; })
+                      .entries(data);
+    // console.log(nest)
+    var genres = nest.map(function(d) { return d.key; });
+    var currentGenreIndex = "Comedy";
 
     var max = d3.max(data, function(d){
                               return d.amount.length;
                               });
+    console.log(max)
+
     var xScale = d3.scaleLinear()
-                   .domain([1986, 2018])
                    // .domain([lowerBound, upperBound])
+                   .domain([1986, 2018])
                    .range([pad.left, width - pad.right])
     var yScale = d3.scaleLinear()
-                   .domain([0, yList.length])
-                   .range([pad.top, height-pad.bottom]);
-
-    var wChart = width - pad.left - pad.right;
-    var hChart = height - pad.bottom - pad.top;
-    console.log(selVar)
-    yearRange = Array.from(new Array(33), (x,i) => i + 1986)
-    // console.log(yearRange)
-
-    gridWidth = Math.floor(wChart / yearRange.length)
-    gridHeight = gridWidth * (yList.length + 2)
-    fontSize = gridWidth * 62.5 / 900
-
-    const placeYLabels = function(){
-
-        var yLabels = svg.selectAll(".heatYLabel")
-         .data(yList)
-         .enter()
-         .append("text")
-         .text(function(d) {
-           // console.log(d)
-           return d; })
-         .attr("x", pad.left * 0.9)
-         .attr("y", function(d,i){
-                    var yCoor = yScale(i) + 7
-                    return yCoor
-                    })
-         .style("font-size", "10px")
-         .style("text-anchor", "end")
-    }
-    placeYLabels()
-    var xLabels = svg.selectAll(".heatXLabel")
-   	 .data(yearRange)
-   	 .enter()
-   	 .append("text")
-   	 .text(function(d) {
-       // console.log(d)
-       return d; })
-   	 .attr("x", function(d,i){
-           var xCoor = xScale(i + 1986) // i + lowerbound
-           return xCoor
-           })
-   	 .attr("y", pad.top * 0.9)
-     .style("font-size", "10px")
-   	 .style("text-anchor", "center")
-
-
-    // when studios
-    var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
-
-
-    var nest = d3.nest()
-                      .key(function(d) { return d.genre; })
-                      .entries(data);
-
-    var genres = nest.map(function(d) { return d.key; });
-    // var currentGenreIndex = "Comedy";
-    var selectGenre = nest.find(function(d) {
-                                              return d.key == selVar;
-                                            });
-
+                     .domain([0, yList.length])
+                     .range([pad.top, height-pad.bottom]);
     var colScale = d3.scaleLinear()
-                    .domain([0, 10])
+                    .domain([0, max-3])
                     .range([50, 255]);
+
+    var selectGenre = nest.find(function(d) {
+                                              return d.key == currentGenreIndex;
+                                            });
 
     var heatmap = svg.selectAll(".heatYear")
       .data(selectGenre.values)
@@ -755,63 +518,119 @@ const updateHeat = function(selVar){
       // .attr("class", "hour bordered")
       .attr("width", gridWidth)
       .attr("height", gridWidth)
-      .attr("class", "heatYear")
       .style("stroke", "white")
-      .on("mouseover", function(d) {
-                       d3.select(this)
-                         .style("opacity", 0.5);
-                       })
-      .on("mouseout", function(d) {
-                      d3.select(this)
-                        .style("opacity", 1.0);
-                      })
-      // .style("stroke-opacity", 0.6)
+      .style("stroke-opacity", 0.6)
       .style("fill", function(d) {
+                                  // console.log(d.amount.length)
                                   var colValue = colScale(d.amount.length)
+                                  // console.log(d.amount.length)
+                                  // console.log(colValue)
                                   var colour = `rgb(0,0,${colValue})`
+                                  // console.log(colour)
                                   if (d.amount.length == 0){
                                       colour = "darkgrey"
                                   }
+                                  // var colour = "blue"
                                   return colour; })
-      .on("click", function(d){
-                   updateAgenda(d.amount)
-                   });
 
-      var heatmap = svg.selectAll(".heatYear")
-                       .data(selectGenre.values)
-                       .transition()
-                       .duration(500)
-                       .style("fill", function(d) {
-                                      var colValue = colScale(d.amount.length)
-                                      var colour = `rgb(0,0,${colValue})`
-                                      if (d.amount.length == 0){
-                                          colour = "darkgrey"
-                                      }
-                                      return colour;
-                                      })
+    var xLabels = svg.selectAll(".heatXLabel")
+   	 .data(yearRange)
+   	 .enter()
+   	 .append("text")
+   	 .text(function(d) {
+       // console.log(d)
+       return d; })
+   	 .attr("x", function(d,i){
+           var xCoor = xScale(i + 1986) // i + lowerbound
+           return xCoor
+           })
+   	 .attr("y", pad.top * 0.9)
+     .style("font-size", "10px")
+   	 .style("text-anchor", "center")
 
-}
-const updateAgenda = function(entries){
-    svg = d3.select(".agenda")
-    // svg.attr("height", function(d){
-    //                    var agendaHeight = 10 * entries.length
-    //                    return agendaHeight
-    //                    })
-    console.log(entries)
-    svg.selectAll(".agendaEntry")
-					.remove()
-					.exit()
+    svg.selectAll(".heatXlabel")
+         .attr("y", 0)
+         .attr("x", 0)
+         .attr("dy", ".35em")
+         .attr("transform", "rotate(10)")
+         .style("text-anchor", "start");
 
-      svg.transition().duration(1000)
-         .attr("height", function(d){
-                           var agendaHeight = 10 * entries.length
-                           return agendaHeight
-                           })
-    for (entry of entries){
-      svg.append("p")
-        .text(entry)
-        .attr("class", "agendaEntry");
-    }
+   var yLabels = svg.selectAll(".heatYLabel")
+    .data(yList)
+    .enter()
+    .append("text")
+    .text(function(d) {
+      // console.log(d)
+      return d; })
+    .attr("x", pad.left * 0.9)
+    .attr("y", function(d,i){
+               var yCoor = yScale(i) + 7
+               return yCoor
+               })
+    .style("font-size", "10px")
+    .style("text-anchor", "end")
+
+
+
+   addSlider(svg, height)
+
+
+  // set scaler for alpha colour
+  var colScale = d3.scaleLinear()
+                   .domain([0, 250])
+                   .range([50, 255]);
+  // makes legend data for the chloropleth map
+  var legData = [[0, "<5 watched"],
+                 [100, "5-10 watched"],
+                 [250, "+10 watched"]]
+  // creates legend element
+  var legend = svg.selectAll(".legend")
+                  .data(legData)
+                  .enter()
+                  .append("g")
+                  .attr("class", "legend")
+                  .attr("transform", function(d,i) {
+                                     var legX = 500
+                                     var legY = 300
+                                     return "translate(" + legX + ","
+                                                         + legY + ")"
+                                     })
+                  .style("font-size","10px");
+  // creates the background for the legend
+  legend.append('rect')
+        .attr('width', 400)
+        .attr('height', legData.length * 20)
+        .attr("x", 0)
+        .attr("y", -20)
+        .style('fill', "white")
+        .attr("opacity", 0.2)
+        .style('stroke', "black");
+
+    // creates the square-colour symbol in the legend
+    legend.append("rect")
+          .attr('width', 50)
+          .attr('height', 20)
+          .attr('x', 10)
+          .attr('y', function(d,i){
+                     var y = i * 15 - 15;
+                     return y;
+                     })
+          .attr("fill", function(d) {
+                        var colValue = colScale(d[0]);
+                        console.log(colValue)
+                        var colour = `rgb(0,0,${colValue})`;
+                        return colour;
+                        });
+    // creates the description beloning to each square symbol in the legend
+    legend.append('text')
+          .attr('x', 70)
+          .attr('y', function(d,i){
+                     var y = i * 15;
+                     return y;
+                     })
+          .text(function(d){
+                return d[1];
+                });
 
 
 }
@@ -826,7 +645,36 @@ const placeOptions = function(){
     right: width * 0.05
   };
 
+  bOptions = d3.select("body")
+              .append("div")
+              .attr("width", width)
+              .attr("height", height)
+              .attr("class", "baroptions");
 
+  var barDataList = ["Genres","Studio"]
+  barData = bOptions.selectAll("inputBD")
+                   .data(barDataList)
+                   .enter()
+                   .append("label")
+                   .text(function(d){return d})
+                   .append("input")
+                   .attr("type", "radio")
+                   .attr("name", "box1")
+                   .attr("value", function(d){
+                                  return d
+                   })
+                   .on("click", function(d){
+                                updateBars(dataGlob[0], svgGlob[0], d)
+                                });
+   barType = bOptions.selectAll("inputBT")
+                    .data(["Big Data", "Small Data"])
+                    .enter()
+                    .append("label")
+                    .text(function(d){return d})
+                    .append("input")
+                    .attr("type", "radio")
+                    .attr("name", "BarType")
+                    .attr("value", function(d){return d})
   lOptions = d3.select("body")
               .append("div")
               .attr("width", width)
@@ -856,7 +704,7 @@ const placeOptions = function(){
                 .append("div")
                 .attr("width", width)
                 .attr("height", height)
-                .attr("class", "agenda");
+                .attr("class", "heatoptions");
 }
 const findLineMax = function(data){
     max = 0
@@ -899,10 +747,10 @@ const addSlider = function(svg, height){
     .width(300)
     .tickFormat(d3.timeFormat('%Y'))
     .tickValues(dataTime)
-    .default(new Date(2007, 10, 3))
+    .default(new Date(1998, 10, 3))
     .on('onchange', val => {
       valueElement.text(d3.timeFormat('%Y')(val));
-      updateHeat()
+      // console.log(val)
     });
 
   var gTime = svg

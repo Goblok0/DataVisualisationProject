@@ -41,3 +41,15 @@
  * note to self: studios gaat sws niet de heatmap in, aangezien het geen interessante data zal representeren aangezien studios alleen maar een of twee releases hebben per seizoen
  * heatmap blokjes zijn geplaats, voor nu alle jaren ipv een segment, net als bij de line chart
    * een knop voor alle jaren zou interessant kunnen zijn, maar dat zou problematisch worden voor de jaren-labels
+
+# day 7
+ * bug gevonden in de scraper, wanneer studios zijn gescheiden met een ",". ziet de scraper dat niet(denk ik) alhoewel dat zou moeten met hoe het algoritme is neergezet.
+   *  tijdelijke fix in de preprocess geplaats, moet weghalen na rescraping
+ * voor de dynamische verdeling tussen barTypes is de median een logische keuze om de bars gelijk te verdelen tussen een small en een big list
+   *  studioMedian krijgt +2 als het kleiner is dan 4, want dan zijn er waarschijnlijk heel veel studios, waarvan je maar een paar anime van hebt gezien
+# day 8
+  * update voor de barchart geimplementeerd, maar axisen updaten niet
+  * update voor heatmap geimplementeerd en een prototype agenda
+  * Link tussen barchart en heatmap geimplementeerd
+      * nog neit mogelijk om dagen aan te tonen in de heatmap
+  * link tussen heatmap en agenda geimplementeerd

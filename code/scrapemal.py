@@ -15,7 +15,8 @@ from selenium import webdriver
 # https://chromedriver.storage.googleapis.com/index.html?path=2.45/
 browser = webdriver.Chrome()
 
-username = "Goblok"
+username = "VellanShadow"
+# username = "Goblok"
 
 
 
@@ -214,8 +215,8 @@ def scrape_page(dom):
             # print(studio)
             studio.pop(0)
             # does not split studios properly
-            if "," in studio:
-                studio = studio.split(",")
+            if ", " in studio:
+                studio = studio.split(", ")
             # cut off irrelevant string
             # print(studio)
         elif "Type:" in detail:
@@ -275,8 +276,6 @@ def scrape_page(dom):
 
     return [title, e_title, year, season, month, day, episodes, minutes,
             genres, studio, type]
-
-
 
 if __name__ == '__main__':
 
