@@ -610,9 +610,15 @@ const makeLineGraph = function(data){
    .attr("value", function(d){
                   return d
    })
-   .on("change", function(d){
-      updateLine()
-   })
+   // .on("change", function(d){
+   //      if(svg.select(this).property("checked")){
+   //          console.log("MEH")
+   //      }
+   //      else{
+   //        console.log(d)
+   //      }
+
+   // })
    labels.append("label")
    .text(function(d){return d})
 
@@ -621,23 +627,14 @@ const makeLineGraph = function(data){
              .append("input")
              .attr("type", "submit")
              .attr("name", "lineAllYears")
-             // .attr("value", "MEH")
+             .attr("value", "MEH")
   }
   placeLineOptions()
 
 
 }
 const updateLine = function(){
-  // check all checkboxes
-  // d3.selectAll("input[type=checkbox]").property("checked", true);
-    //https://www.includehelp.com/code-snippets/javascript-print-value-of-all-checked-selected-checkboxes.aspx
-    var genres=document.getElementsByName('lineChecks');
-		var selectedGenres=[];
-		for(var i=0; i<genres.length; i++){
-  			if(genres[i].type=='checkbox' && genres[i].checked==true)
-  				selectedGenres.push(genres[i].value);
-		}
-		console.log(selectedGenres);
+    continue
 }
 const makeHeatGraph = function(data){
   // console.log(data)

@@ -53,3 +53,8 @@
   * Link tussen barchart en heatmap geimplementeerd
       * nog neit mogelijk om dagen aan te tonen in de heatmap
   * link tussen heatmap en agenda geimplementeerd
+# day 9
+  * De slider beinvloed de heatmap en de heatmap is nu in bezit van een 10 jaar range, ipv alle jaren
+      * wel lijken de data in de boxes niet correct mee te sliden(slider van 2007 --> 2008 zorgt voor dat de Winter 2007 box data komt te staan in de herfst 2007 box)
+      * ook moeten de x labels verwijderd worden voordat de nieuwe x labels geplaats worden
+ * heb de genre checkbox toevoeging dynamisch gemaakt, maar nog niet netjes in 1 box
