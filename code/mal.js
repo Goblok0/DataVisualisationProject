@@ -3,9 +3,9 @@
 
 
 var dataGlob = [];
-var svgGlob = [];
 var barSelGenre = "Comedy";
 var selTime = 2007;
+var totEnt = 0
 window.onload = function() {
     // decodes the JSON file
     var username = "goblok"
@@ -17,14 +17,14 @@ window.onload = function() {
         preProcess(response)
         // console.log(data)
         // barDataGenres = data[0][0]
-        barData = dataGlob[0]
-        lineData = dataGlob[1]
-        heatData = dataGlob[2]
-        console.log(dataGlob)
-        makeBarGraph(barData)
-        makeLineGraph(lineData)
-        makeHeatGraph(heatData)
-        placeOptions()
+        barData = dataGlob[0];
+        lineData = dataGlob[1][0];
+        heatData = dataGlob[2];
+        console.log(dataGlob);
+        makeBarGraph(barData);
+        makeLineGraph(lineData);
+        makeHeatGraph(heatData);
+        placeOptions();
 
 
     }).catch(function(e){
@@ -33,6 +33,7 @@ window.onload = function() {
 };
 const preProcess = function(data){
     var data = data[0];
+    totEnt = data.length
     var barData = preBarData(data);
     var lineData = preLineData(data);
     var heatData = preHeatData(data);
@@ -125,33 +126,33 @@ const preBarData = function(data){
     // // console.log(genreList)
     // // console.log(studioList)
     return [[bigGenreList, smallGenreList], [bigStudioList, smallStudioList]]
-}
+};
 
 const preLineData = function(data){
     // console.log(data)
-    yearDict = {}
-    genreDict = {}
+    var yearDict = {};
+    var genreDict = {};
 
     for (variable of data){
-        title = variable[0]
-        year = variable[2]
+        var title = variable[0];
+        var year = variable[2];
         for (genre of variable[8]){
             // check if genre has already been seen before
             if (genre == "unknown"){
-                continue
-            }
+                continue;
+            };
             if (!(genreDict[genre])){
-               genreDict[genre] = {}
-            }
-            inDict = genreDict[genre]
+               genreDict[genre] = {};
+            };
+            inDict = genreDict[genre];
             if (!(inDict[year])){
-               inDict[year] = []
-            }
-            inDict[year].push(title)
+               inDict[year] = [];
+            };
+            inDict[year].push(title);
         }
     };
     // console.log(genreDict)
-    yearRange = Array.from(new Array(33), (x,i) => i + 1986)
+    yearRange = Array.from(new Array(33), (x,i) => i + 1986);
     // console.log(yearRange)
     // fill up the empty years
     for (year of yearRange){
@@ -159,10 +160,10 @@ const preLineData = function(data){
         for (genre of Object.keys(genreDict)){
             // console.log(genre)
             if(!genreDict[genre][year]){
-                genreDict[genre][year] = []
-            }
-        }
-    }
+                genreDict[genre][year] = [];
+            };
+        };
+    };
     // console.log(genreDict)
     // var lineData = {}
     // for (let key of Object.keys(genreDict)){
@@ -178,63 +179,66 @@ const preLineData = function(data){
     //     }
     // };
 
-    lineData = []
-    var parseDate = d3.timeParse("%Y")
+    lineData = [];
+    specLineData = {};
+    var parseDate = d3.timeParse("%Y");
     for (let key of Object.keys(genreDict)){
-        lineDataDict = {}
-        lineDataDict["genre"] = `${key}`
-        lineDataDict["years"] = []
-        inGenre = genreDict[key]
+        lineDataDict = {};
+        lineDataDict["genre"] = `${key}`;
+        lineDataDict["years"] = [];
+        inGenre = genreDict[key];
         // console.log(inGenre)
         for (year of Object.keys(inGenre)){
             // console.log(year)
-            yearDict = {}
+            yearDict = {};
             // yearDict["year"] = parseDate(year)
-            yearDict["year"] = parseInt(year)
-            yearDict["yearData"] = inGenre[year]
-            lineDataDict["years"].push(yearDict)
+            yearDict["year"] = parseInt(year);
+            yearDict["yearData"] = inGenre[year];
+            lineDataDict["years"].push(yearDict);
         }
         // lineDataDict[]
-        lineData.push(lineDataDict)
+        lineData.push(lineDataDict);
+        specLineData[key] = lineDataDict;
     };
-    // console.log(lineData)
 
-    return lineData
+    console.log(specLineData)
+
+    return [lineData, specLineData];
 
 }
 
 const preHeatData = function(data){
     // console.log(data)
     // console.log(data)
-    genreDict = {}
+    var genreDict = {};
 
     for (variable of data){
         // console.log(variable)
-        title = variable[0]
-        year = variable[2]
-        season = variable[3]
+        var title = variable[0];
+        var year = variable[2];
+        var season = variable[3];
         for (genre of variable[8]){
             // check if genre has already been seen before
             if ((genre == "unknown") || (season == "unknown")){
-                continue
-            }
+                continue;
+            };
             if (!(genreDict[genre])){
-               genreDict[genre] = {}
-            }
-            inDict = genreDict[genre]
+               genreDict[genre] = {};
+            };
+            inDict = genreDict[genre];
             if (!(inDict[year])){
-               inDict[year] = {}
-            }
-            inYear = inDict[year]
+               inDict[year] = {};
+            };
+            inYear = inDict[year];
             if (!(inYear[season])){
-               inYear[season] = []
-            }
-            inYear[season].push(title)
+               inYear[season] = [];
+            };
+            inYear[season].push(title);
         }
     };
-    seasons = ["Winter", "Spring", "Summer", "Fall"]
+    var seasons = ["Winter", "Spring", "Summer", "Fall"];
     // console.log(genreDict)
-    yearRange = Array.from(new Array(33), (x,i) => i + 1986)
+    var yearRange = Array.from(new Array(33), (x,i) => i + 1986);
     // console.log(yearRange)
     // fill up the empty years and empty seasons
     for (year of yearRange){
@@ -242,134 +246,107 @@ const preHeatData = function(data){
         for (genre of Object.keys(genreDict)){
             // console.log(genre)
             if(!genreDict[genre][year]){
-                genreDict[genre][year] = {}
-            }
+                genreDict[genre][year] = {};
+            };
             for (season of seasons){
                 if(!genreDict[genre][year][season]){
-                    genreDict[genre][year][season] = []
-                }
-            }
-        }
-    }
+                    genreDict[genre][year][season] = [];
+                };
+            };
+        };
+    };
     // console.log(genreDict)
-    genreList = []
+    var genreList = []
     for (genre of Object.keys(genreDict)){
-        inGenre = genreDict[genre]
+        var inGenre = genreDict[genre];
         for (year of Object.keys(inGenre)){
-            inYear = inGenre[year]
+            var inYear = inGenre[year];
             for (season of Object.keys(inYear)){
-                heatEntry = {}
-                heatEntry["genre"] = genre
+                var heatEntry = {};
+                heatEntry["genre"] = genre;
                 if (season == "Winter"){
-                    heatEntry["season"] = 1
+                    heatEntry["season"] = 1;
                 }
                 else if (season == "Spring"){
-                   heatEntry["season"] = 2
+                   heatEntry["season"] = 2;
                 }
                 else if (season == "Summer"){
-                   heatEntry["season"] = 3
+                   heatEntry["season"] = 3;
                 }
                 else {
-                   heatEntry["season"] = 4
-                }
+                   heatEntry["season"] = 4;
+                };
                 // else (season == "Fall"){
                 //    heatEntry["season"] = 4
                 // }
-                heatEntry["year"] = year
+                heatEntry["year"] = year;
                 // console.log(inYear[season])
-                heatEntry["amount"] = inYear[season]
-                genreList.push(heatEntry)
-              }
+                heatEntry["amount"] = inYear[season];
+                genreList.push(heatEntry);
+              };
 
-            }
-        }
+            };
+        };
     // console.log(genreList)
-    return genreList
+    return genreList;
 }
 
 const makeBarGraph = function(data){
+  // creates the SVG element in the html-body
+  var svg = d3.select("body")
+              .append("svg")
+              .attr("class", "barchart");
 
-    // data = data[1]
-    // // pick bigBardata temporarily
-    // data = data[0]
+
+  // defines the size of the SVG
+  var width = parseInt(svg.style("width"));
+  var height = parseInt(svg.style("height"));
+
+  // defines the padding for the graph
+  pad = {
+    top: height * 0.1,
+    bottom: height * 0.1,
+    left: width * 0.2,
+    right: width * 0.05
+  };
+
+  // // defines the size of the chart
+  // var wChart = width - pad.left - pad.right;
+  // var hChart = height - pad.bottom - pad.top;
+
+  // creates the background of the SVG-element
+  // svg.append("rect")
+  //    .attr("width", "100%")
+  //    .attr("height", "100%")
+  //    .attr("fill", "grey")
+  //    .attr("opacity", 0.1);
 
 
-    // defines the size of the SVG
-    var width = 600;
-    var height = 400;
+   yScaleBar = d3.scaleBand();
+   xScaleBar = d3.scaleLinear();
 
-    // defines the padding for the graph
-    pad = {
-      top: height * 0.1,
-      bottom: height * 0.1,
-      left: width * 0.2,
-      right: width * 0.05
-    };
+   yAxisCallBar = d3.axisLeft();
+   xAxisCallBar = d3.axisBottom();
 
-    // defines the size of the chart
-    var wChart = width - pad.left - pad.right;
-    var hChart = height - pad.bottom - pad.top;
+  // add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(" + 0 + "," + height * 0.905 + ")")
+      .attr("class", "barXAxis");
 
-    // creates the SVG element in the html-body
-    var svg = d3.select("body")
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .attr("class", "barchart");
-    // not needed
-    svgGlob.push(svg)
+  // add the y Axis
+  svg.append("g")
+      .attr("transform", "translate(" + pad.left * 0.9 + "," + 0 + ")")
+      .attr("class", "barYAxis");
 
-    // creates the background of the SVG-element
-    svg.append("rect")
-       .attr("width", "100%")
-       .attr("height", "100%")
-       .attr("fill", "grey")
-       .attr("opacity", 0.1);
-     //
-     // data = dataGlob[0][0][0]
-     //
-     // data.sort(function(a, b) {
-     //           return d3.ascending(a[1], b[1])
-     //           })
-     // // isolates the lowest data value from the data
-     // var min = d3.min(data, function(d){
-     //                            return d[1];
-     //                            });
-     // // isolates the highest data value from the data
-     // var max = d3.max(data, function(d){
-     //                            return d[1];
-     //                            });
+  const addOptions = function(){
 
-     yScale = d3.scaleBand()
-                .range([height - pad.bottom, pad.top])
-     xScale = d3.scaleLinear()
-                .range([pad.left, width - pad.right])
-      // yScale.domain(data.map(function(d){
-      //                         return d[0]
-      //                         }))
-      // xScale.domain([min - 1, max])
-
-    // add the x Axis
-    var barXAxis = svg.append("g")
-                      .attr("transform", "translate(" + 0 + "," + height * 0.9 + ")")
-                      .attr("class", "barYAxis")
-                      .call(d3.axisBottom(xScale));
-
-    // add the y Axis
-    var barYAxis = svg.append("g")
-                      .attr("transform", "translate(" + pad.left * 0.9 + "," + 0 + ")")
-                      .attr("class", "barXAxis")
-                      .call(d3.axisLeft(yScale));
-
-    const addOptions = function(){
-
-      bOptions = d3.select("body")
+      var bOptions = d3.select("body")
                   .append("div")
                   .attr("width", width)
                   .attr("height", height)
                   .attr("class", "baroptions");
 
-      barData = bOptions.selectAll("inputBD")
+      var barData = bOptions.selectAll("inputBD")
                        .data(["Genres","Studio"])
                        .enter()
                        .append("label")
@@ -385,7 +362,7 @@ const makeBarGraph = function(data){
                                     updateBars()
                                     });
 
-       barType = bOptions.selectAll("inputBT")
+       var barType = bOptions.selectAll("inputBT")
                         .data(["Big Data", "Small Data"])
                         .enter()
                         .append("label")
@@ -398,11 +375,26 @@ const makeBarGraph = function(data){
                         .on("click", function(d){
                                      updateBars()
                                      });
-    }
-
-    addOptions()
-    updateBars()
+       var barQuant = bOptions.selectAll("inputBT")
+                        .data(["Numbers", "Percentile"])
+                        .enter()
+                        .append("label")
+                        .text(function(d){return d})
+                        .append("input")
+                        .attr("type", "radio")
+                        .attr("name", "barQuant")
+                        .attr("value", function(d,i){return i})
+                        .property("checked", function(d) {return d==="Numbers";})
+                        .on("click", function(d){
+                                     console.log("meh")
+                                     updateBars()
+                                     });
+  }
+  addOptions()
+  updateBars()
 }
+
+
 const updateBars = function(){
     svg = d3.select(".barchart")
     var width = parseInt(svg.style("width"));
@@ -416,55 +408,61 @@ const updateBars = function(){
       right: width * 0.05
     };
 
-    try{
-      var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
-      var typeVar = parseInt(d3.select('input[name="barType"]:checked').node().value);
+    var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
+    var typeVar = parseInt(d3.select('input[name="barType"]:checked').node().value);
+    var quantVar = parseInt(d3.select('input[name="barQuant"]:checked').node().value);
+    console.log(quantVar)
+    const quant = function(d){
+          if (quantVar == 0){
+              return d
+          }
+          else{
+            return d / totEnt * 100
+          }
     }
-    catch (err){
-        // alert("MEH")
-        var dataVar = 0
-        var typeVar = 0
-    }
-    //
 
     data = dataGlob[0][dataVar][typeVar]
 
     data.sort(function(a, b) {
               return d3.ascending(a[1], b[1])
               })
+
     // isolates the lowest data value from the data
     var min = d3.min(data, function(d){
-                               return d[1];
+                               return quant(d[1]);
                                });
     // isolates the highest data value from the data
     var max = d3.max(data, function(d){
-                               return d[1];
+                               return quant(d[1]);
                                });
+    var bigdataMax = d3.max(dataGlob[0][dataVar][0], function(d){
+                                                  return quant(d[1])
+    })
 
     // console.log([min, max])
-    yScale.domain(data.map(function(d){
-                            return d[0]
+    yScaleBar.domain(data.map(function(d){
+                            return d[0];
                             }))
-    xScale.domain([min - 1, max])
+          .range([height - pad.bottom, pad.top])
+    xScaleBar.domain([min - 1, max])
+          .range([pad.left, width - pad.right])
+    if (quantVar == 1){
+       xScaleBar.domain([min - 0.2, max])
+    }
 
+    var colScale = d3.scaleLinear()
+                     .domain([0, quant(bigdataMax)])
+                     .range([d3.rgb("#6e63b1"), d3.rgb('#3058ff')])
 
+    yAxisCallBar.scale(yScaleBar)
+    xAxisCallBar.scale(xScaleBar)
 
-    ////
-    // function update(data) {
-//   var u = d3.select('#content')
-//     .selectAll('div')
-//     .data(data);
-//
-//   u.enter()
-//     .append('div')
-//     .merge(u)
-//     .text(function(d) {
-//       return d;
-//     });
-//
-//   u.exit().remove();
-// }
-    /////
+    svg.select(".barXAxis")
+       .transition()
+       .call(xAxisCallBar)
+     svg.select(".barYAxis")
+        .transition()
+        .call(yAxisCallBar)
 
     var rects = svg.selectAll("rect")
           .data(data)
@@ -473,11 +471,15 @@ const updateBars = function(){
     rects.enter()
              .append("rect")
              .merge(rects)
-          //   .transition().duration(1000)
-             .attr("y", function(d) {return yScale(d[0]);})
+             // .transition().duration(1000)
+             .attr("y", function(d) {return yScaleBar(d[0]);})
              .attr("x", pad.left)
-             .attr("width", function(d) {return xScale(d[1]) - pad.left;})
-             .attr("height", yScale.bandwidth() * 0.9)
+             .attr("height", yScaleBar.bandwidth() * 0.9)
+             .attr("width", function(d) {return xScaleBar(quant(d[1])) - pad.left;})
+             .style("fill", function(d){
+                            var colour = colScale(d[1])
+                            return colour
+             })
              .on("mouseover", function(d) {
                               d3.select(this)
                                 .style("opacity", 0.5);
@@ -487,33 +489,25 @@ const updateBars = function(){
                                .style("opacity", 1.0);
                              })
              .on("click", function(d){
-                          if (dataVar == 0){
-                              barSelGenre = d[0]
-                              updateHeat()
-                          }
-                          });
-    // https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe
-    // svg.selectAll("rect")
-    //    .data(data)
-    //
-    //    .attr("y", function(d) {return yScale(d[0]);})
-    //    .attr("x", pad.left)
-    //    .attr("width", function(d) {return xScale(d[1]) - pad.left;})
-    //    .attr("height", yScale.bandwidth() * 0.9)
-    rects.exit().remove();
+                              if (dataVar == 0){
+                                  barSelGenre = d[0]
+                                  updateHeat()
+                              }
+                          })
 
-    svg.select(".barYAxis")
-       .call(yScale)
-    svg.select(".barXAxis")
-       .call(xScale)
+    // https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe
+
+    rects.exit().remove();
 }
 
 const makeLineGraph = function(data){
-  // console.log(data)
-  // console.log(data.Action)
-  // data = data.Action
-  var width = 600;
-  var height = 400;
+
+  svg = d3.select("body")
+          .append("svg")
+          .attr("class", "linechart");
+
+  var width = parseInt(svg.style("width"));
+  var height = parseInt(svg.style("height"));
   pad = {
           top: height * 0.2,
           bottom: height * 0.1,
@@ -521,74 +515,33 @@ const makeLineGraph = function(data){
           right: width * 0.05
         };
 
-  var wChart = width - pad.left - pad.right;
-  var hChart = height - pad.bottom - pad.top;
+  svg.append("rect")
+     .attr("width", "100%")
+     .attr("height", "100%")
+     .attr("fill", "grey")
+     .attr("opacity", 0.1);
 
-  n = 2
-  slideValue = 2003
-  lowerBound = slideValue - 5
-  upperBound = slideValue + 5
+  // var wChart = width - pad.left - pad.right;
+  // var hChart = height - pad.bottom - pad.top;
 
-  max = findLineMax(data)
-  // console.log(max)
+  yScale = d3.scaleLinear()
+  xScale = d3.scaleLinear()
 
-  svg = d3.select("body")
-          .append("svg")
-          .attr("width", width)
-          .attr("height", height)
-          .attr("class", "linechart");
-  svgGlob.push(svg)
+  yAxisCall = d3.axisLeft().ticks(5)
+  xAxisCall = d3.axisBottom().ticks(5).tickFormat(d3.format("d"));
 
- var lineOpacity = "0.25";
- var lineOpacityHover = "0.85";
- var otherLinesOpacityHover = "0.1";
- var lineStroke = "1.5px";
- var lineStrokeHover = "2.5px";
-
- var xScale = d3.scaleLinear()
-                // .domain([lowerBound, upperBound])
-                .domain([1986, 2018])
-                .range([pad.left, width - pad.right])
- var yScale = d3.scaleLinear()
-                .domain([0, max])
-                .range([height - pad.bottom, pad.top])
-
- var color = d3.scaleOrdinal(d3.schemeCategory10);
-
- var line = d3.line()
-              .x(d => xScale(d.year))
-              .y(d => yScale(d.yearData.length))
-
- let lines = svg.append('g')
-                .attr("class", "lines");
-
- lines.selectAll(".line-group")
-      .data(data).enter()
-      .append("g")
-      .attr('class', 'line-group')
-      .append('path')
-        .attr('class', 'line')
-        .attr('d', d => line(d.years))
-        .style('stroke', (d, i) => color(i))
-        .style('opacity', lineOpacity)
-      var xAxis = d3.axisBottom(xScale).ticks(5);
-    var yAxis = d3.axisLeft(yScale).ticks(5);
-
-  var xAxis = d3.axisBottom()
-                .scale(xScale)
-                .tickFormat(d3.format("d"));
-  var yAxis = d3.axisLeft()
-                .scale(yScale);
 
   svg.append("g")
-     .attr("transform", "translate("+ 0 + ","
-                                    + yScale(0) + ")")
-     .call(xAxis);
+     .attr("transform", "translate("+ 0 + ","+ height * 0.9 + ")")
+     .attr("class", "lineXAxis")
   // creates the Y-axis
   svg.append("g")
-     .attr("transform", "translate("+ (pad.left) + ","
-                                    + 0 + ")")
-     .call(yAxis);
+     .attr("transform", "translate("+ (pad.left) + "," + 0 + ")")
+     .attr("class", "lineYAxis")
+
+  // let lines = svg.append('g')
+  //                .attr("class", "lines");
+  var colourLabels = {}
   const placeLineOptions = function(){
     lOptions = d3.select("body")
                 .append("div")
@@ -600,21 +553,27 @@ const makeLineGraph = function(data){
    foundGenres.sort(function(a, b) {
              return d3.ascending(a[0], b[0])
              })
+
    labels = lOptions.selectAll("input")
                     .data(foundGenres)
                     .enter()
                     .append("div")
+    var color = d3.scaleOrdinal(d3.schemeCategory10);
+
    labels.append("input")
    .attr("type", "checkbox")
    .attr("name", "lineChecks")
    .attr("value", function(d){
                   return d
    })
+   .property("checked", true)
    .on("change", function(d){
-      updateLine()
+      updateLine(colourLabels)
    })
    labels.append("label")
-   .text(function(d){return d})
+   .text(function(d,i){
+         colourLabels[d] = color(i)
+         return d})
 
     lOptions.append("label")
              .text("Show all years")
@@ -622,27 +581,114 @@ const makeLineGraph = function(data){
              .attr("type", "submit")
              .attr("name", "lineAllYears")
              // .attr("value", "MEH")
+
   }
   placeLineOptions()
+  var lines = svg.append('g')
+                 .attr("class", "lines");
+  updateLine(colourLabels)
 
 
 }
-const updateLine = function(){
+const updateLine = function(colourLabels){
   // check all checkboxes
   // d3.selectAll("input[type=checkbox]").property("checked", true);
     //https://www.includehelp.com/code-snippets/javascript-print-value-of-all-checked-selected-checkboxes.aspx
+    svg = d3.select(".linechart");
+    var width = parseInt(svg.style("width"));
+    var height = parseInt(svg.style("height"));
+    // console.log(colourLabels)
+    pad = {
+            top: height * 0.2,
+            bottom: height * 0.1,
+            left: width* 0.15,
+            right: width * 0.05
+          };
+
     var genres=document.getElementsByName('lineChecks');
 		var selectedGenres=[];
 		for(var i=0; i<genres.length; i++){
   			if(genres[i].type=='checkbox' && genres[i].checked==true)
   				selectedGenres.push(genres[i].value);
 		}
-		console.log(selectedGenres);
+		// console.log(selectedGenres);
+    data = []
+
+    for (genre of selectedGenres){
+       data.push(dataGlob[1][1][genre])
+    }
+    console.log(data)
+
+    // n = 2
+    // slideValue = 2003
+    // lowerBound = slideValue - 5
+    // upperBound = slideValue + 5
+
+    max = findLineMax(data)
+    // console.log(max)
+
+   var lineOpacity = "0.25";
+   var lineOpacityHover = "0.85";
+   var otherLinesOpacityHover = "0.1";
+   var lineStroke = "1.5px";
+   var lineStrokeHover = "2.5px";
+
+   yScale.domain([0, max])
+         .range([height - pad.bottom, pad.top])
+
+   xScale.domain([1986, 2018])
+         .range([pad.left, width - pad.right])
+                  // .domain([lowerBound, upperBound])
+   var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+   yAxisCall.scale(yScale)
+   xAxisCall.scale(xScale)
+   svg.select(".lineXAxis")
+      .transition()
+      .call(xAxisCall)
+    svg.select(".lineYAxis")
+       .transition()
+       .call(yAxisCall)
+
+   var line = d3.line()
+                .x(function(d){
+                    return xScale(d.year)
+                })
+                .y(function(d){
+                    return yScale(d.yearData.length)
+                })
+   svg.select(".lines").remove()
+   var lines = svg.append('g')
+                  .attr("class", "lines");
+
+
+   lines.selectAll(".line-group")
+        .data(data).enter()
+        .append("g")
+        .attr('class', 'line-group')
+        .append('path')
+          // .transition()
+          .attr('class', 'line')
+          .attr('d', function(d){
+                      return line(d.years)
+                    })
+          .style('stroke', function(d, i){
+                           var colour = colourLabels[d.genre]
+                           return colour
+                 })
+          .style('opacity', lineOpacity)
+
+   lines.exit().remove();
+
 }
+
 const makeHeatGraph = function(data){
-  // console.log(data)
-  var width = 600;
-  var height = 400;
+  svg = d3.select("body")
+          .append("svg")
+          .attr("class", "heatchart");
+
+  var width = parseInt(svg.style("width"));
+  var height = parseInt(svg.style("height"));
 
   pad = {
     top: height * 0.2,
@@ -651,12 +697,7 @@ const makeHeatGraph = function(data){
     right: width * 0.1
   };
 
-  svg = d3.select("body")
-          .append("svg")
-          .attr("width", width)
-          .attr("height", height)
-          .attr("class", "heatchart");
-  svgGlob.push(svg)
+
   addSlider(svg, height)
 
 
@@ -676,8 +717,8 @@ const makeHeatGraph = function(data){
                     .append("g")
                     .attr("class", "legend")
                     .attr("transform", function(d,i) {
-                                       var legX = 500
-                                       var legY = 300
+                                       var legX = width * 0.8
+                                       var legY = height * 0.8
                                        return "translate(" + legX + ","
                                                            + legY + ")"
                                        })
@@ -752,7 +793,7 @@ const updateHeat = function(){
                    // .domain([lowerBound, upperBound])
                    .range([pad.left, width - pad.right])
     var yScale = d3.scaleLinear()
-                   .domain([0, yList.length])
+                   .domain([1, yList.length])
                    .range([pad.top, height-pad.bottom]);
 
     var wChart = width - pad.left - pad.right;
@@ -776,7 +817,7 @@ const updateHeat = function(){
            return d; })
          .attr("x", pad.left * 0.9)
          .attr("y", function(d,i){
-                    var yCoor = yScale(i) + 7
+                    var yCoor = yScale(i+1.5)
                     return yCoor
                     })
          .style("font-size", "10px")
@@ -834,7 +875,7 @@ const updateHeat = function(){
                                 return xValue
                               })
       .attr("y", function(d) {
-                                var yValue = yScale(d.season - 1)
+                                var yValue = yScale(d.season)
                                 return yValue
                               })
       // .attr("class", "hour bordered")
@@ -893,9 +934,9 @@ const updateAgenda = function(entries){
                            return agendaHeight
                            })
     for (entry of entries){
-      svg.append("p")
-        .text(entry)
-        .attr("class", "agendaEntry");
+        svg.append("p")
+          .text(entry)
+          .attr("class", "agendaEntry");
     }
 }
 const placeOptions = function(){
@@ -936,14 +977,14 @@ const findLineMax = function(data){
     return max
 }
 const addSlider = function(svg, height){
-  var valueElement = svg.append("div")
-                      .attr("class", "col-sm-2")
-                      .append("p")
-                      .attr("id", "value-time")
-  var slideElement = svg.append("div")
-                      .attr("class", "col-sm")
-                      .append("p")
-                      .attr("id", "slider-time")
+  // var valueElement = svg.append("div")
+  //                     .attr("class", "col-sm-2")
+  //                     .append("p")
+  //                     .attr("id", "value-time")
+  // var slideElement = svg.append("div")
+  //                     .attr("class", "col-sm")
+  //                     .append("p")
+  //                     .attr("id", "slider-time")
 
   // Time
   var dataTime = d3.range(0, 18).map(function(d) {
@@ -955,7 +996,7 @@ const addSlider = function(svg, height){
     .min(d3.min(dataTime))
     .max(d3.max(dataTime))
     .step(1000 * 60 * 60 * 24 * 365)
-    .width(parseInt(svg.style("width")) * 0.95)
+    .width(parseInt(svg.style("width")) * 0.91)
     .tickFormat(d3.timeFormat('%Y'))
     .tickValues(dataTime)
     .default(new Date(selTime, 10, 3))
@@ -968,7 +1009,7 @@ const addSlider = function(svg, height){
 
   var gTime = svg
     .append('svg')
-    .attr('width', 600)
+    .attr('width', 1000)
     .attr('height', 100)
     .attr("x", -20)
     .attr("y", height - 100)
@@ -977,5 +1018,5 @@ const addSlider = function(svg, height){
 
   gTime.call(sliderTime);
 
-  valueElement.text(d3.timeFormat('%Y')(sliderTime.value()));
+  // valueElement.text(d3.timeFormat('%Y')(sliderTime.value()));
 }

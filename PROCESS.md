@@ -58,3 +58,10 @@
       * wel lijken de data in de boxes niet correct mee te sliden(slider van 2007 --> 2008 zorgt voor dat de Winter 2007 box data komt te staan in de herfst 2007 box)
       * ook moeten de x labels verwijderd worden voordat de nieuwe x labels geplaats worden
  * heb de genre checkbox toevoeging dynamisch gemaakt, maar nog niet netjes in 1 box
+ * nu er een selectie gemaakt moet worden voor de linechart zal de preprocessing van de lineData aangepast moeten worden naar lineData waaruit een selectie gemaakt kan worden en lineData die alle data klaar kan tonen
+    * de checboxes zijn nog buggy wat betreft het plaatsen in hun box
+# day 10
+  * heb de axis transition kunnen fixen [hierdoor](https://bl.ocks.org/shimizu/914c769f05f1b2e1d09428c7eedd7f8a)
+  * heb kleuren toegevoegd aan de bars. ik heb gekozen voor een aardig neutrale gradient van blauw aangezien het niet iets goeds noch slechts is om meer te hebben gezien van de ene genre/studio dan het ander
+      * ik heb er ook voor gekozen om de big list max te nemen als domain.max omdat het dan meer een distinctie plaatst tussen de big en small list. anders lijkt het alsof de hoogste waarde van de small list (bijv: 12) even hoog is als de hoogste waarde van de big list(bijv. 303)
+  * heb de kleur van line van elke genre een kleur toegekend, dit zorgt ervoor dat het minder verwarrend is wanneer het tussen linedata wisselt
