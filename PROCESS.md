@@ -65,3 +65,14 @@
   * heb kleuren toegevoegd aan de bars. ik heb gekozen voor een aardig neutrale gradient van blauw aangezien het niet iets goeds noch slechts is om meer te hebben gezien van de ene genre/studio dan het ander
       * ik heb er ook voor gekozen om de big list max te nemen als domain.max omdat het dan meer een distinctie plaatst tussen de big en small list. anders lijkt het alsof de hoogste waarde van de small list (bijv: 12) even hoog is als de hoogste waarde van de big list(bijv. 303)
   * heb de kleur van line van elke genre een kleur toegekend, dit zorgt ervoor dat het minder verwarrend is wanneer het tussen linedata wisselt
+# day 10.3 (Saturday)
+ * heb de code ge-update volgense de style-guide
+# day 11
+ * heb ervoor gezorgd dat de lijsten kunnen worden gekozen vanuit de pagina zelf
+ * heb een bug gevonden waarbij een genre geselecteerd kan worden via de bar, maar dat de heatchart geen idee wat het ermee aanmoet, omdat het preprocessing van de heatdata alles filtert als het seizoen onbekend, wat de bardata dus niet doet. dit zorgt ervoor dat data aanwezig is in de barchart die geheel afwezig is van de heatdata
+    * mogelijk oplossing, een "unknown" data object maken die alle gefilterde entries oppikt en het in een vakje buiten de heatmap presenteert
+* bug gevonden: wanneer je van 1 lijst naar een andere lijst wisselt krijg je een error wat betreft de checkboxes, omdat het programma checkt wat aangevinkt is en wat niet. de checkboxes zelf worden intieel gemaakt op basis van welke genres er worden gevonden in de completed list, maar als je dus wisselt naar een andere lijst en e is een discrepantie in genres tussen de twee lijsten, dan telt het teveel of te weinig waardoor er een error ontstaat
+* heb de genrekeuzen kunnen laten update
+    * nieuwe bug, de checkboxes kunnen niet meer gechecked of unchecked worden
+* waarschijnlijk word het aantonen van een dag-heatmap los gelaten, niet omdat het preprocessen uitgebreid moet worden per se, maar eerder omdat het niet heel interessant is op welke dagen welke series waren uitgekomen, wel in welke season ze waren aangetoond.
+* de bug van de heatmap is opgelost. probleem was dat het de waarde van een vakje op de verkeerde plek zou plaatsen na het sliden. Opgelost nadat de data geordend werd. niet zeker hoe dit een probleem veroorzaakte, aangezien de y coordinaat en grootte van de heatbox constant blijft, ongeacht of de data geordend is of niet. 

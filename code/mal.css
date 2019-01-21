@@ -116,3 +116,14 @@ div.col-sm-2{
   stroke-width: 2;
   fill: none;
 }
+.toolTip {
+  position: absolute;
+  display: none;
+  min-width: 50px;
+  height: auto;
+  background: mediumpurple;
+  border: 1px solid lightblue;
+  /* padding: 5px; */
+  text-align: center;
+  z-index:99999
+}
