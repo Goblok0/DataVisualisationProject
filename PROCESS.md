@@ -1,10 +1,10 @@
-# day 1
+## day 1
   crawled usable data from the MAL-page
 
   note: had van het begin al de lijsten moeten opdelen in aparte JSON Files ipv van 1. Heb hele ochtend en halve middag verspilt aan slight internet connection errors door SP wifi
-# day 2
+## day 2
   Stage-Training, dus weinig tot geen voortgang
-# day 3
+## day 3
   * data pre-processed voor barchart
   * bar chart gemaakt, axis en keluringen zijn nog incorrect
 
@@ -14,9 +14,9 @@
 
   ![alt text](doc/proto_1.png)
   * heb de lay-out anders neergezet dan in de proposal, omdat het mij netter lijkt om ze in een apart vak te doen dan in hetzelfde vak, mogelijk chartvak verlengen zodat de buttonvak zich erin bevind, maar voor nu is dit gestructureerder
-# day 4
+## day 4
   Stage-Training, dus weinig tot geen voortgang
-# day 5
+## day 5
   * de multi-line chart met jaren en seizoenen als x-axis gaat misschien te lastig worden, dus voor nu zal het alleen jaren worden als x-axis
   * de slide bar zal een range representeren(e.g. 1997 --> 1987:2007), dit zal het makkelijker maken om de slide te implementeren, meerendeels omdat ik dan geen cut off point hoe neer te zetten en omdat je dan de slider niet naar een punt kan plaatsen waarbij alleen de halve chart data presenteert
     * Een knop om alle jaren te laten zien, zal ook mogelijk zijn. aangezien het interessante data is om te representeren
@@ -27,47 +27,47 @@
   * Heb de bargrafieken kunnen sorteren dmv D3, wat noodzakelijk is om de data begrijpelijk te presenteren.      
     * Indien tijd over overweeg ook dergelijke sortering op naam
 
-# day 5.3(Saturday)
+## day 5.3(Saturday)
   * heb de radiobuttons data verdeeld tussen BD(Type data die gebruikt word: Genre of studio) en BT(Welk deel van de gekozen data het gebruikt de grote of kleine hoeveelheden)
   * heb de data structuur voor de multi-line chart aangepast, zodat het bruikbaar is voor de manier waarop [deze site](https://codepen.io/anon/pen/Jwewwg?editors=1012) zijn multi-line chart maakt
     *  note to self: proper credit geven
-# day 5.6(Sunday)
+## day 5.6(Sunday)
  * Data voor de heatmap is geordend op een manier dat bruikbaar is voor de season-heatmap
  * elke chartdata is opgezet voor de genres, maar nog niet voor de studios, ten eerste zijn de genres neezetten belangrijker omdat het waarschijnlijk interessanter is voor de gebruiker. Maar studio zal uiteinderlijk worden opgezet
 
-# day 6
+## day 6
  * heb de key voor value veranderd naar amount bij het preprocessen van de heatData omdat JS een numerieke waarde verwacht bij zo'n key
     * het vreemde is dat d3.max dan alsnog de correcte max kan vinden van een 0/NaN lijst
  * note to self: studios gaat sws niet de heatmap in, aangezien het geen interessante data zal representeren aangezien studios alleen maar een of twee releases hebben per seizoen
  * heatmap blokjes zijn geplaats, voor nu alle jaren ipv een segment, net als bij de line chart
    * een knop voor alle jaren zou interessant kunnen zijn, maar dat zou problematisch worden voor de jaren-labels
 
-# day 7
+## day 7
  * bug gevonden in de scraper, wanneer studios zijn gescheiden met een ",". ziet de scraper dat niet(denk ik) alhoewel dat zou moeten met hoe het algoritme is neergezet.
    *  tijdelijke fix in de preprocess geplaats, moet weghalen na rescraping
  * voor de dynamische verdeling tussen barTypes is de median een logische keuze om de bars gelijk te verdelen tussen een small en een big list
    *  studioMedian krijgt +2 als het kleiner is dan 4, want dan zijn er waarschijnlijk heel veel studios, waarvan je maar een paar anime van hebt gezien
-# day 8
+## day 8
   * update voor de barchart geimplementeerd, maar axisen updaten niet
   * update voor heatmap geimplementeerd en een prototype agenda
   * Link tussen barchart en heatmap geimplementeerd
       * nog neit mogelijk om dagen aan te tonen in de heatmap
   * link tussen heatmap en agenda geimplementeerd
-# day 9
+## day 9
   * De slider beinvloed de heatmap en de heatmap is nu in bezit van een 10 jaar range, ipv alle jaren
       * wel lijken de data in de boxes niet correct mee te sliden(slider van 2007 --> 2008 zorgt voor dat de Winter 2007 box data komt te staan in de herfst 2007 box)
       * ook moeten de x labels verwijderd worden voordat de nieuwe x labels geplaats worden
  * heb de genre checkbox toevoeging dynamisch gemaakt, maar nog niet netjes in 1 box
  * nu er een selectie gemaakt moet worden voor de linechart zal de preprocessing van de lineData aangepast moeten worden naar lineData waaruit een selectie gemaakt kan worden en lineData die alle data klaar kan tonen
     * de checboxes zijn nog buggy wat betreft het plaatsen in hun box
-# day 10
+## day 10
   * heb de axis transition kunnen fixen [hierdoor](https://bl.ocks.org/shimizu/914c769f05f1b2e1d09428c7eedd7f8a)
   * heb kleuren toegevoegd aan de bars. ik heb gekozen voor een aardig neutrale gradient van blauw aangezien het niet iets goeds noch slechts is om meer te hebben gezien van de ene genre/studio dan het ander
       * ik heb er ook voor gekozen om de big list max te nemen als domain.max omdat het dan meer een distinctie plaatst tussen de big en small list. anders lijkt het alsof de hoogste waarde van de small list (bijv: 12) even hoog is als de hoogste waarde van de big list(bijv. 303)
   * heb de kleur van line van elke genre een kleur toegekend, dit zorgt ervoor dat het minder verwarrend is wanneer het tussen linedata wisselt
-# day 10.3 (Saturday)
+## day 10.3 (Saturday)
  * heb de code ge-update volgense de style-guide
-# day 11
+## day 11
  * heb ervoor gezorgd dat de lijsten kunnen worden gekozen vanuit de pagina zelf
  * heb een bug gevonden waarbij een genre geselecteerd kan worden via de bar, maar dat de heatchart geen idee wat het ermee aanmoet, omdat het preprocessing van de heatdata alles filtert als het seizoen onbekend, wat de bardata dus niet doet. dit zorgt ervoor dat data aanwezig is in de barchart die geheel afwezig is van de heatdata
     * mogelijk oplossing, een "unknown" data object maken die alle gefilterde entries oppikt en het in een vakje buiten de heatmap presenteert
@@ -75,4 +75,17 @@
 * heb de genrekeuzen kunnen laten update
     * nieuwe bug, de checkboxes kunnen niet meer gechecked of unchecked worden
 * waarschijnlijk word het aantonen van een dag-heatmap los gelaten, niet omdat het preprocessen uitgebreid moet worden per se, maar eerder omdat het niet heel interessant is op welke dagen welke series waren uitgekomen, wel in welke season ze waren aangetoond.
-* de bug van de heatmap is opgelost. probleem was dat het de waarde van een vakje op de verkeerde plek zou plaatsen na het sliden. Opgelost nadat de data geordend werd. niet zeker hoe dit een probleem veroorzaakte, aangezien de y coordinaat en grootte van de heatbox constant blijft, ongeacht of de data geordend is of niet. 
+* de bug van de heatmap is opgelost. probleem was dat het de waarde van een vakje op de verkeerde plek zou plaatsen na het sliden. Opgelost nadat de data geordend werd op seizoen en jaar. Niet zeker hoe dit een probleem veroorzaakte, aangezien de y coordinaat en grootte van de heatbox constant blijft, ongeacht of de data geordend is of niet. Het enige wat variabel was is de x, coordinaat, wat de heatboxjes op zn minst op de zelfde rij had moeten houden ipv hoger of lager
+* note-to-self:
+    * structuur van de pagina moet anders dan gepland. met name de heatmap moet verplaats worden naar iets dichterbij bij de bar chart om de transitie van de heatmap te zien bij een andere selectie van genre, maakt het ook makkelijker voor de gebruiker als hij/zij snel verschillen wilt zien tussen genres in de heatmap en dus niet omhoog en omlaag snel hoeft te scrollen. mogelijke opzet is [barchart - optiesbar en agenda en daarnaast de heatmap] horizontaal en eronder de line chart die de breedte van de bovenste helft heeft. mogelijk kan dan de genrekeuze voor de line chart eronder geplaatst worden geordend in vakjes
+    *  studios zijn vreselijk oninteressant om te gebruiken in de andere visualisaties aangezien studios maar 2 producten creeeren per jaar, wat dus niet veel betekent in zowel de line als de heatchart, maar wel vreselijk interessant in de barchart simpelweg doordat totale kwantiteit nog iets kan zeggen(daarnaast maakt het dingen makkelijker voor mij).
+* note: Filter de namen van de studio "add some" "none found"
+## day 12
+* heb de JSON files verplaatst naar een datamap\
+* bug in scrapemal gevonden, programma werkt niet als de instellingen van de pagina plaatjes toelaten van desbetreffende entree in de lijst. dit zal opgemerkt worden in hoe de site gebruikt moet worden, aangezien het makkelijker is om de instellingen te veranderen dan het programma aan te passen en het een kleine moeite is voor de gebruiker zelf
+* preprocess filtert nu studio "add some" en "none found"
+* font sizes van heatmap vergroot
+* heb de heatmap dichter bij de barchart geplaatst zodat de transitie van de heatmap makkelijker aanschout kan worden.
+* de genres voor de linechart worden nu verdeeld in 2 vakken, maar nog steeds de bug als dat ik ze wil updaten dat de checkboxes neit meer  gechecked of ge unchecked kunnen worden
+* labels van de barchart wroden nu groter of kleiner afhankelijk van hoeveel bars op het huidige moment
+* note to self: nette structuur opzetten

@@ -44,6 +44,10 @@ window.onload = function() {
         makeBarGraph(barData);
         makeLineGraph(lineData);
         makeHeatGraph(heatData);
+        // places the options, remove eventually
+        placeOptions();
+
+
     }).catch(function(e){
              throw(e);
              });
@@ -53,7 +57,6 @@ window.onload = function() {
          var request = [d3.json(`data/${username}_${listType}.json`)];
          Promise.all(request).then(function(response) {
              // preprocesses the data
-             var barSelGenre = "Comedy"
              preProcess(response);
              updateBars()
              updateLine()
@@ -64,9 +67,9 @@ window.onload = function() {
      })
 };
 
+
 const preProcess = function(data){
-    //resets dataGlob if a new list type is selected
-    dataGlob = [];
+    dataGlob = []
     // calls upon the preprocessing functions of each chart
     var data = data[0];
     totEnt = data.length;
@@ -133,7 +136,7 @@ const preBarData = function(data){
     var studioMedian = d3.median(Object.values(studioDict));
     // makes the studio data be split more evenly
     if (studioMedian < 3){
-        studioMedian = studioMedian + 1;
+        studioMedian = studioMedian + 2;
     };
 
     // goes through entry in the dict
@@ -431,7 +434,7 @@ const updateBars = function(){
     var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
     var typeVar = parseInt(d3.select('input[name="barType"]:checked').node().value);
     var quantVar = parseInt(d3.select('input[name="barQuant"]:checked').node().value);
-    // quantifies the data to percentages if the selected in the radio buttons
+    // shows the data in percentages if the selected in the radio buttons
     const quant = function(d){
           if (quantVar == 0){
               return d;
@@ -481,19 +484,9 @@ const updateBars = function(){
     svg.select(".barXAxis")
        .transition()
        .call(xAxisCallBar);
-
-
-    console.log(data.length)
      svg.select(".barYAxis")
-        .style("font-size",  function(d){
-          var size = 400 / data.length
-          console.log(size)
-          return size
-          })
         .transition()
         .call(yAxisCallBar);
-
-
     // selects and creates the bars
     var rects = svg.selectAll("rect")
                    .data(data);
@@ -537,19 +530,19 @@ const updateBars = function(){
                                   updateHeat()
                               }
                           });
-
-    // var barLabels = svg.append("g")
-    //                    .attr("class", "barLabelG")
-    // barLabels.selectAll(".text")
+    // svg.select(".text").remove()
+    // svg.append("g")
+    //    .attr("class", "text")
+    // svg.selectAll(".text")
     //    .data(data)
     //    .enter()
     //    .append("text")
+    //    .attr("class", "barLabel")
     //    .attr("y", function(d) {return yScaleBar(d[0]) + 13;})
     //    .attr("x", pad.left)
     //    .text(function(d){
     //          return Math.round(quant(d[1]) * 100)/100
-    //           })
-    //    .attr("class", "barLabel")
+    //    })
 
 
     // https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe
@@ -593,12 +586,11 @@ const makeLineGraph = function(data){
      .attr("transform", "translate("+ (pad.left) + "," + 0 + ")")
      .attr("class", "lineYAxis");
  // creates the options box for the line chart
- d3.select("body")
+   d3.select("body")
      .append("div")
-     .attr("class", "lineOptions1")
- d3.select("body").append("div")
-     .attr("class", "lineOptions2");
-
+     .attr("width", width)
+     .attr("height", height)
+     .attr("class", "lineOptions");
   var lines = svg.append('g')
                  .attr("class", "lines");
   updateLine();
@@ -613,73 +605,53 @@ const updateLOptions = function(){
    foundGenres.sort(function(a, b) {
              return d3.ascending(a[0], b[0])
            });
-   genres2 = foundGenres.splice(foundGenres.length/2)
-   var foundGenreList = [null, foundGenres, genres2]
 
-   for (i = 1; i < 3; i++){
-       foundGenres = foundGenreList[i]
-       d3.select(`.lineOptions${i}`)
-         .attr("height", function(d){
-                         var height = 10 * foundGenres.length
-                         return height;;
-                         });
-       // d3.select(".lineOptions").selectAll("input").remove()
-       // d3.select(".lineOptions").selectAll("label").remove()
-       // d3.select(`.lineOptions${i}`).selectAll("*").remove()
-       // d3.select(".lineOptions").selectAll("lineAllYears").remove()
+   // d3.select(".lineOptions").selectAll("input").remove()
+   // d3.select(".lineOptions").selectAll("label").remove()
 
-       lOptions = d3.select(`.lineOptions${i}`)
-       var width = parseInt(lOptions.style("width"));
-       var height = parseInt(lOptions.style("height"));
+   lOptions = d3.select(".lineOptions")
 
-       // creates the labels for the checkboxes
-       var labels = lOptions.selectAll("input")
-                            .data(foundGenres)
-                            .enter()
-                            .append("div")
-
-       labels.append("input")
-             .attr("type", "checkbox")
-             .attr("name", "lineChecks")
-             .attr("value", function(d,i){
-                            return d
-             })
-             .property("checked", true)
-             .on("change", function(d){
-                           updateLine();
-                         });
-       // sets up the genre-labels for the checkboxes
-       labels.append("label")
-             .attr("name", "lineLabels")
-             .text(function(d,i){
-                   return d});
-   }
+   // creates the labels for the checkboxes
+   var labels = lOptions.selectAll("input")
+                        .data(foundGenres)
+                        .enter()
+                        .append("div");
 
 
-  // creates the buttons for check/uncheck all
-   d3.select(".checkAll").remove()
-   d3.select(`.lineOptions1`)
-      .append("label")
+   labels.append("input")
+         .attr("type", "checkbox")
+         .attr("name", "lineChecks")
+         .attr("value", function(d){
+                        return d
+         })
+         .property("checked", true)
+         .on("change", function(d){
+                       updateLine();
+                     });
+   // sets up the labels and assigns colour to each genre in the dataset
+   labels.append("label")
+         .attr("name", "lineLabels")
+         .text(function(d,i){
+               return d});
+
+   lOptions.append("label")
            .append("input")
            .attr("type", "submit")
-           .attr("class", "checkAll")
+           .attr("name", "lineAllYears")
              .attr("value", "check all")
              .on("click", function(d){
                 d3.selectAll("input[type=checkbox]").property("checked", true);
                 updateLine()
              })
-   d3.select(".unCheckAll").remove()
-   d3.select(`.lineOptions2`)
-     .append("label")
+   lOptions.append("label")
            .append("input")
            .attr("type", "submit")
-           .attr("class", "unCheckAll")
+           .attr("name", "lineAllYears")
              .attr("value", "uncheck all")
              .on("click", function(d){
                 d3.selectAll("input[type=checkbox]").property("checked", false);
                 updateLine()
              })
-
 }
 const updateLine = function(){
     updateLOptions();
@@ -704,18 +676,9 @@ const updateLine = function(){
     for (genre of selectedGenres){
        data.push(dataGlob[1][1][genre])
     }
-    // alter lineopacity depending on the number of selected genres
-    if (data.length < 6){
-       var lineOpacityOn = 0.9
-       var lineOpacityOff = 0.8
+    if (data == []){
+       return
     }
-    else{
-       var lineOpacityOn = 0.85
-       var lineOpacityOff = 0.25
-    }
-    // if (data == []){
-    //    return alert("MEH")
-    // }
 
     // n = 2
     // slideValue = 2003
@@ -790,18 +753,18 @@ const updateLine = function(){
                            var colour = colourLabels[d.genre];
                            return colour;
                  })
-          .style('opacity', lineOpacityOff)
+          .style('opacity', "0.25")
           .on("mouseover", function(d) {
                 d3.selectAll('.line')
           					.style('opacity', "0.1");
                 d3.select(this)
-                  .style('opacity', lineOpacityOn)
+                  .style('opacity', "0.85")
                   .style("stroke-width", "2.5px")
                   .style("cursor", "pointer");
               })
           .on("mouseout", function(d) {
               d3.selectAll(".line")
-        					.style('opacity', lineOpacityOff);
+        					.style('opacity', "0.25");
               d3.select(this)
                 .style("stroke-width", "1.5px")
                 .style("cursor", "none");
@@ -893,6 +856,7 @@ const makeHeatGraph = function(data){
             .style('fill', "white")
             .attr("opacity", 0.1)
             .style('stroke', "black");
+
       // creates the square-colour symbol in the legend
       legend.append("rect")
             .attr('width', 50)
@@ -963,7 +927,7 @@ const updateHeat = function(){
 
     var gridWidth = Math.floor(wChart / yearRange.length);
 
-
+    var fontSize = gridWidth * 62.5 / 900;
 
     const placeYLabels = function(){
         svg.selectAll(".heatYLabel")
@@ -1073,16 +1037,32 @@ const updateAgenda = function(entries){
 					.remove()
 					.exit();
 
-    svg.attr("height", function(d){
-                         var agendaHeight = 10 * entries.length
-                         return agendaHeight;;
-                       });
+      svg.attr("height", function(d){
+                           var agendaHeight = 10 * entries.length
+                           return agendaHeight;;
+                         });
     for (entry of entries){
         svg.append("p")
           .text(entry)
           .attr("class", "agendaEntry");
     };
 }
+const placeOptions = function(){
+  var width = 600;
+  var height = 400;
+
+  var pad = {
+              top: height * 0.1,
+              bottom: height * 0.2,
+              left: width* 0.15,
+              right: width * 0.05
+            };
+
+
+
+
+}
+
 const assignColours = function(){
     var color = d3.scaleOrdinal(d3.schemeCategory10);
     var index = 0

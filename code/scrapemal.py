@@ -15,8 +15,8 @@ from selenium import webdriver
 # https://chromedriver.storage.googleapis.com/index.html?path=2.45/
 browser = webdriver.Chrome()
 
-username = "VellanShadow"
-# username = "Goblok"
+# username = "VellanShadow"
+username = "Goblok"
 
 
 
@@ -33,6 +33,7 @@ def main():
     #                4: "Dropped",
     #                6: "PlanToWatch"
     #              }
+    page_index = [4]
     full_anime_list = []
     for index in page_index:
         MAL_URL = f"https://myanimelist.net/animelist/{username}?status={index}"
@@ -57,7 +58,7 @@ def main():
         print(anime_list)
         full_anime_list.append(anime_list)
 
-        with open(f'{username}_{index}.json', 'w') as outfile:
+        with open(f'data/{username}_{index}.json', 'w') as outfile:
             json.dump(anime_list, outfile)
     #
     # with open(f'{username}.json', 'w') as outfile:
