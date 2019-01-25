@@ -89,3 +89,22 @@
 * de genres voor de linechart worden nu verdeeld in 2 vakken, maar nog steeds de bug als dat ik ze wil updaten dat de checkboxes neit meer  gechecked of ge unchecked kunnen worden
 * labels van de barchart wroden nu groter of kleiner afhankelijk van hoeveel bars op het huidige moment
 * note to self: nette structuur opzetten
+
+## day 13
+* moet de check/uncheck all buttons telkens opnieuw laten creeren, doordat anders de eerste paar checkboxes van de genres bij de linechart afwezig zijn door een bug die ik niet kan beredeneren
+* bug: heatmap update zichzelf niet autoamtisch nadat er een nieuwe lijst word gekozen, moet eerst de slider verplaatsen dan pas update het zichzelf naar de nieuwe data
+* barchart bug van transition opgelost, geen idee waarom, probleem bars blijven van grotere dataset naar kleienre. oplossing: on functies bove de transition en andere attributes geplaatst
+*  username kan nu worden ingevoerd en checked of de file voor die user en specifieke lijst bestaat bestaat
+* tijd gespendeerd om python op te roepen via ajax maar op zn best de script in text format opgehaald.
+* de error die aanwezig was in de lineproprocess, waardoor er errors kwamen bij de linechart door van een lijst naar een andere te gaan is opgelost, maar heeft het probleem van de uncheckable checkboxes niet opgelost
+
+## day 14
+* heb de data van de account van een vriend gescraped, geen problemen met visualizatie, probleem wel dat bij veel minder data de labels van de barchart te groot worden, dus dit is een simpele maar worthwhile bug om te verhelpen
+    * het concept om python op te roepen in javascript zal worden geschrapt doordat ik niet de tijd heb om te leren hoe AJAX werkt en de mechanismes van client en server side programmeren.
+    * wel kan ik het nu simuleren, doordat ik 2 datasets heb en beide tonen interessante data voor de gebruiker zelf. Ook toont het aan dat het voor meerdere gebruikers toepasbaar is.
+* tip gekregen: zou interessant zijn om de lengte van de lijst te tonen ergens in de barchart voor een wat beter kader buiten procenten
+* note-to-self: heatmap toont producitejaar, niet gezientijd
+
+## day 15
+* Hackaton gebruikte significant meer tijd dan dat ik van plan was om het te geven. heb een Dope stress-ball aan over gehouden dus al is vergeven
+* HEB DE LINECHART CHECKBOX BUG OPGELOST, het probleem zat hem in de manier dat updateLOptions werd opgeroepen telkens wanneer er een veradering hoort plaats te vinden in de line chart. Hoe de checkboxes werden geupdate was door alle divs(dus checkbox en label) te verwijderen in de Lineoption divs en nieuwe checkboxes aan te maken. Dus het probleem was dat de checkboxes niet meer uitgevinkt konden worden, maar wel ge-update omdat telkens alle checkboxes removed en aangemaakt worden. Het probleem hier is dus dat de property van alle checkboxes aangevinkt als default werden aangemaakt, dus wanneer je een checkbox probeerde uit te vinken kon je in de console een reactie zien, maar omdat alle checkboxes opnieuw werden aangemaakt met de default-vink zorgde dat ervoor dat de checkbox aangevinkt bleef. De oplossing hiervoor is door een variabele mee tegeven aan de updateLine() wanneer het opgeroepen wordt door de checkbox of de check/uncheck all. Deze variabele wordt gechecked in updateLines en slaat het opnieuw aanmaken van de checkboxes en dergelijke over. Dit is een indirecte manier om ook aan  het programma mee tegeven dat je niet van lijst aan het verwisselen bent en dus niet hoeft te updaten. bonus is dat je ook geen variabele hoeft mee te geven wanneer wisselt van gebruikers data 

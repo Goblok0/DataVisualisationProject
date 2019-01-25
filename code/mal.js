@@ -1,5 +1,7 @@
+
 /*
 To do(-), done(+)  {
+  - fix transition of barcharts
   - update line graph
   - fix genre selection
   - make agenda visually pleasing
@@ -25,21 +27,21 @@ var tooltip = d3.select("body")
                 .append("div")
                 .attr("class", "toolTip");
 var colourLabels = {};
-
+var username;
 // calls upon the preprocessing and initial graphs
 window.onload = function() {
-    var username = "goblok";
+    username = d3.select('input[name="username"]').node().value;
     var listType = parseInt(d3.select('input[name="listOption"]:checked').node().value);;
     // decodes the JSON file
     var request = [d3.json(`data/${username}_${listType}.json`)];
     // ensures that all data is loaded properly before calling any functions
     Promise.all(request).then(function(response) {
+
         // preprocesses the data
         preProcess(response);
         var barData = dataGlob[0];
         var lineData = dataGlob[1][0];
         var heatData = dataGlob[2];
-        assignColours()
         console.log(dataGlob);
         makeBarGraph(barData);
         makeLineGraph(lineData);
@@ -49,21 +51,44 @@ window.onload = function() {
              });
    d3.selectAll('input[name="listOption"]')
      .on("change", function(d) {
-         listType = parseInt(d3.select('input[name="listOption"]:checked').node().value);;
-         var request = [d3.json(`data/${username}_${listType}.json`)];
-         Promise.all(request).then(function(response) {
-             // preprocesses the data
-             var barSelGenre = "Comedy"
-             preProcess(response);
-             updateBars()
-             updateLine()
-             updateHeat()
-         }).catch(function(e){
-                  throw(e);
-                  });
+         updateAll("Newlist")
      })
-};
 
+};
+const updateAll = function(via){
+      fileExists;
+
+      if (via == "viaSubmit"){
+         username = d3.select('input[name="username"]').node().value;
+      }
+      listType = parseInt(d3.select('input[name="listOption"]:checked').node().value);;
+      var json = `data/${username}_${listType}.json`
+      if (!fileExists(json)) {
+          return alert("Invalid Username or List Selection");
+      }
+      var request = [d3.json(`data/${username}_${listType}.json`)]
+
+      Promise.all(request).then(function(response) {
+          console.log(response)
+          // preprocesses the data
+          var barSelGenre = "Comedy"
+          preProcess(response);
+          assignColours()
+          updateBars()
+          updateLine()
+          updateHeat()
+      }).catch(function(e){
+               throw(e);
+               });
+     function fileExists(url){
+         //credit: Imortenson, https://stackoverflow.com/questions/15054182/javascript-check-if-file-exists
+         var http = new XMLHttpRequest();
+         http.open('HEAD', url, false);
+         http.send();
+         return http.status!=404;
+     }
+
+}
 const preProcess = function(data){
     //resets dataGlob if a new list type is selected
     dataGlob = [];
@@ -74,7 +99,9 @@ const preProcess = function(data){
     var lineData = preLineData(data);
     var heatData = preHeatData(data);
     dataGlob.push(barData, lineData, heatData);
+    assignColours()
 };
+
 const preBarData = function(data){
     var genreDict = {};
     var studioDict = {};
@@ -174,7 +201,7 @@ const preLineData = function(data){
     for (variable of data){
         var title = variable[0];
         var year = variable[2];
-        if ((year < 1986) || (year == "unknown")){
+        if ((year < 1986) || (year == "unknown") || ("NaN" == String(parseInt(year)))){
            continue
         }
         // goes through each genre in the entry
@@ -354,7 +381,7 @@ const makeBarGraph = function(data){
 
   // add the y Axis
   svg.append("g")
-      .attr("transform", "translate(" + pad.left * 0.9 + "," + 0 + ")")
+      .attr("transform", "translate(" + pad.left * 0.85 + "," + 0 + ")")
       .attr("class", "barYAxis");
 
   // adds the options box of the bar graph
@@ -364,9 +391,11 @@ const makeBarGraph = function(data){
                   .append("div")
                   .attr("width", width)
                   .attr("height", height)
-                  .attr("class", "baroptions");
-
-      var barData = bOptions.selectAll("inputBD")
+                  .attr("class", "barOptions");
+      d3.select(".barOptions").append("text")
+                              .text("Select Dataset:")
+      d3.select(".barOptions").append("br")
+      bOptions.selectAll("inputBD")
                        .data(["Genres","Studio"])
                        .enter()
                        .append("label")
@@ -381,8 +410,14 @@ const makeBarGraph = function(data){
                        .on("click", function(d){
                                     updateBars()
                                     });
+       d3.select(".barOptions").append("br")
+       d3.select(".barOptions").append("br")
+       d3.select(".barOptions").append("text")
+                               .text("Select more/less frequent genres/studios:")
+       d3.select(".barOptions").append("br")
 
-       var barType = bOptions.selectAll("inputBT")
+
+       bOptions.selectAll("inputBT")
                         .data(["Big Data", "Small Data"])
                         .enter()
                         .append("label")
@@ -395,8 +430,12 @@ const makeBarGraph = function(data){
                         .on("click", function(d){
                                      updateBars()
                                      });
-
-       var barQuant = bOptions.selectAll("inputBT")
+       d3.select(".barOptions").append("br")
+       d3.select(".barOptions").append("br")
+       d3.select(".barOptions").append("text")
+                               .text("Show data as Number or Percentages of list:")
+       d3.select(".barOptions").append("br")
+       bOptions.selectAll("inputBT")
                         .data(["Numbers", "Percentile"])
                         .enter()
                         .append("label")
@@ -424,8 +463,8 @@ const updateBars = function(){
     var pad = {
                 top: height * 0.1,
                 bottom: height * 0.1,
-                left: width * 0.2,
-                right: width * 0.1
+                left: width * 0.175,
+                right: width * 0.15
               };
     // obtains the selection options from the bar radio buttons
     var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
@@ -483,11 +522,12 @@ const updateBars = function(){
        .call(xAxisCallBar);
 
 
-    console.log(data.length)
      svg.select(".barYAxis")
         .style("font-size",  function(d){
           var size = 400 / data.length
-          console.log(size)
+          if (size > 16){
+             size = 16
+          }
           return size
           })
         .transition()
@@ -500,28 +540,20 @@ const updateBars = function(){
     rects.enter()
              .append("rect")
              .merge(rects)
-             // .transition().duration(1000)
-             .attr("y", function(d) {return yScaleBar(d[0]);})
-             .attr("x", pad.left)
-             .attr("height", yScaleBar.bandwidth() * 0.9)
-             .attr("width", function(d) {return xScaleBar(quant(d[1])) - pad.left;})
-             .style("fill", function(d){
-                            var colour = colScale(d[1])
-                            return colour
-             })
              .on("mouseover", function(d) {
                               d3.select(this)
                                 .style("opacity", 0.5);
                               // makes the string that represents the value
                               var amount = Math.round(quant(d[1]) * 100)/100
                               if (quantVar == 0){
-                               var strValue = `#${amount} in list`
+                               var strValue = `${amount} in list`
                               }
                               else{
                                var strValue = `${amount}% of list`
                              };
+                             strValue = d[0] + ":\n" + strValue
                              // creates the tooltip for the bar
-                              tooltip.style("left", width * 0.90 + svgLeft)
+                              tooltip.style("left", width - pad.right * 0.9 + svgLeft)
                                      .style("top", yScaleBar(d[0]) + svgTop + 5)
                                      .style("display", "inline-block")
                                      .html(strValue)
@@ -536,21 +568,17 @@ const updateBars = function(){
                                   barSelGenre = d[0]
                                   updateHeat()
                               }
-                          });
+                          })
 
-    // var barLabels = svg.append("g")
-    //                    .attr("class", "barLabelG")
-    // barLabels.selectAll(".text")
-    //    .data(data)
-    //    .enter()
-    //    .append("text")
-    //    .attr("y", function(d) {return yScaleBar(d[0]) + 13;})
-    //    .attr("x", pad.left)
-    //    .text(function(d){
-    //          return Math.round(quant(d[1]) * 100)/100
-    //           })
-    //    .attr("class", "barLabel")
-
+             .attr("y", function(d) {return yScaleBar(d[0]);})
+             .attr("x", pad.left)
+             .transition().duration(1000)
+             .attr("height", yScaleBar.bandwidth() * 0.9)
+             .attr("width", function(d) {return xScaleBar(quant(d[1])) - pad.left;})
+             .style("fill", function(d){
+                            var colour = colScale(d[1])
+                            return colour
+                            })
 
     // https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe
 
@@ -570,15 +598,6 @@ const makeLineGraph = function(data){
               left: width* 0.15,
               right: width * 0.05
             };
-  //
-  // svg.append("rect")
-  //    .attr("width", "100%")
-  //    .attr("height", "100%")
-  //    .attr("fill", "grey")
-  //    .attr("opacity", 0.1);
-
-  // var wChart = width - pad.left - pad.right;
-  // var hChart = height - pad.bottom - pad.top;
 
   // creates scales and axis
   yScaleLine = d3.scaleLinear();
@@ -596,7 +615,8 @@ const makeLineGraph = function(data){
  d3.select("body")
      .append("div")
      .attr("class", "lineOptions1")
- d3.select("body").append("div")
+ d3.select("body")
+   .append("div")
      .attr("class", "lineOptions2");
 
   var lines = svg.append('g')
@@ -604,85 +624,12 @@ const makeLineGraph = function(data){
   updateLine();
 };
 
-const updateLOptions = function(){
 
-   data = dataGlob[1][0]
+const updateLine = function(via){
+    if (via != "viaCheckBox"){
+       updateLOptions();
+    }
 
-   // finds all genres and sorts them alphabetically
-   var foundGenres = data.map(a => a.genre)
-   foundGenres.sort(function(a, b) {
-             return d3.ascending(a[0], b[0])
-           });
-   genres2 = foundGenres.splice(foundGenres.length/2)
-   var foundGenreList = [null, foundGenres, genres2]
-
-   for (i = 1; i < 3; i++){
-       foundGenres = foundGenreList[i]
-       d3.select(`.lineOptions${i}`)
-         .attr("height", function(d){
-                         var height = 10 * foundGenres.length
-                         return height;;
-                         });
-       // d3.select(".lineOptions").selectAll("input").remove()
-       // d3.select(".lineOptions").selectAll("label").remove()
-       // d3.select(`.lineOptions${i}`).selectAll("*").remove()
-       // d3.select(".lineOptions").selectAll("lineAllYears").remove()
-
-       lOptions = d3.select(`.lineOptions${i}`)
-       var width = parseInt(lOptions.style("width"));
-       var height = parseInt(lOptions.style("height"));
-
-       // creates the labels for the checkboxes
-       var labels = lOptions.selectAll("input")
-                            .data(foundGenres)
-                            .enter()
-                            .append("div")
-
-       labels.append("input")
-             .attr("type", "checkbox")
-             .attr("name", "lineChecks")
-             .attr("value", function(d,i){
-                            return d
-             })
-             .property("checked", true)
-             .on("change", function(d){
-                           updateLine();
-                         });
-       // sets up the genre-labels for the checkboxes
-       labels.append("label")
-             .attr("name", "lineLabels")
-             .text(function(d,i){
-                   return d});
-   }
-
-
-  // creates the buttons for check/uncheck all
-   d3.select(".checkAll").remove()
-   d3.select(`.lineOptions1`)
-      .append("label")
-           .append("input")
-           .attr("type", "submit")
-           .attr("class", "checkAll")
-             .attr("value", "check all")
-             .on("click", function(d){
-                d3.selectAll("input[type=checkbox]").property("checked", true);
-                updateLine()
-             })
-   d3.select(".unCheckAll").remove()
-   d3.select(`.lineOptions2`)
-     .append("label")
-           .append("input")
-           .attr("type", "submit")
-           .attr("class", "unCheckAll")
-             .attr("value", "uncheck all")
-             .on("click", function(d){
-                d3.selectAll("input[type=checkbox]").property("checked", false);
-                updateLine()
-             })
-
-}
-const updateLine = function(){
-    updateLOptions();
     //https://www.includehelp.com/code-snippets/javascript-print-value-of-all-checked-selected-checkboxes.aspx
     var svg = d3.select(".linechart");
     var width = parseInt(svg.style("width"));
@@ -699,8 +646,8 @@ const updateLine = function(){
   			if(genres[i].type=='checkbox' && genres[i].checked==true)
           selectedGenres.push(genres[i].value);
 		};
+    // console.log(selectedGenres)
     var data = []
-
     for (genre of selectedGenres){
        data.push(dataGlob[1][1][genre])
     }
@@ -783,14 +730,6 @@ const updateLine = function(){
         .append('path')
           // .transition()
           .attr('class', 'line')
-          .attr('d', function(d){
-                      return line(d.years)
-                    })
-          .style('stroke', function(d){
-                           var colour = colourLabels[d.genre];
-                           return colour;
-                 })
-          .style('opacity', lineOpacityOff)
           .on("mouseover", function(d) {
                 d3.selectAll('.line')
           					.style('opacity', "0.1");
@@ -806,10 +745,106 @@ const updateLine = function(){
                 .style("stroke-width", "1.5px")
                 .style("cursor", "none");
               })
+          .on("click", function(d){
+                           var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
+                           if (dataVar == 0){
+                               barSelGenre = d.genre
+                               updateHeat()
+                           }
+                       })
+          .attr('d', function(d){
+                      // console.log(d);
+                      return line(d.years)
+                    })
+          .style('stroke', function(d){
+                           var colour = colourLabels[d.genre];
+                           return colour;
+                 })
+          .style('opacity', lineOpacityOff)
+
    lines.exit().remove();
 
 }
+const updateLOptions = function(){
 
+   data = dataGlob[1][1]
+   // finds all genres and sorts them alphabetically
+   var foundGenres = Object.keys(data)
+   foundGenres.sort(function(a, b) {
+             return d3.ascending(a[0], b[0])
+           });
+
+   var genres2 = foundGenres.splice(foundGenres.length/2)
+   var foundGenreList = [null, foundGenres, genres2]
+   // var dataLength1 = Array.from(new Array(), (x,i) => i)
+   // var dataLength2 = Array.from(new Array(11), (x,i) => i)
+   // var dataLength = [null, dataLength1, dataLength2]
+   for (i = 1; i < 3; i++){
+       foundGenres = foundGenreList[i]
+       lOptions = d3.select(`.lineOptions${i}`)
+
+       lOptions.attr("height", function(d){
+                         var height = 10 * foundGenres.length
+                         return height;;
+                         });
+       // d3.select(".lineOptions").selectAll("input").remove()
+       // d3.select(".lineOptions").selectAll("label").remove()
+       lOptions.selectAll("*").remove()
+       // d3.select(".lineOptions").selectAll("lineAllYears").remove()
+
+       var width = parseInt(lOptions.style("width"));
+       var height = parseInt(lOptions.style("height"));
+
+       // creates the labels for the checkboxes
+       var labels = lOptions.selectAll("input")
+                            .data(foundGenres)
+                            .enter()
+                            .append("div")
+
+       labels.append("input")
+             .attr("type", "checkbox")
+             .attr("name", "lineChecks")
+             .attr("class", "cBox")
+             .attr("value", function(d,i){
+                            return d
+             })
+             .property("checked", true)
+             .on("change", function(d){
+                           updateLine("viaCheckBox");
+                         });
+       // sets up the genre-labels for the checkboxes
+       labels.append("label")
+             .attr("name", "lineLabels")
+             .attr("class", "cBoxLabel")
+             .text(function(d,i){
+                   return d});
+   }
+  // creates the buttons for check/uncheck all
+  // has to be redone at every call of this function due to checkbox bugs
+
+   d3.select(`.lineOptions1`)
+      .append("label")
+           .append("input")
+           .attr("type", "submit")
+           .attr("class", "checkAll")
+             .attr("value", "check all")
+             .on("click", function(d){
+                d3.selectAll("input[type=checkbox]").property("checked", true);
+                updateLine("viaCheckBox")
+             })
+
+   d3.select(`.lineOptions2`)
+     .append("label")
+           .append("input")
+           .attr("type", "submit")
+           .attr("class", "unCheckAll")
+             .attr("value", "uncheck all")
+             .on("click", function(d){6666
+                d3.selectAll("input[type=checkbox]").property("checked", false);
+                updateLine("viaCheckBox")
+             })
+
+}
 const makeHeatGraph = function(data){
   svg = d3.select("body")
           .append("svg")
@@ -819,11 +854,15 @@ const makeHeatGraph = function(data){
   var width = parseInt(svg.style("width"));
   var height = parseInt(svg.style("height"));
 
-  var hOptions = d3.select("body")
-                   .append("div")
-                   .attr("width", width)
-                   .attr("height", height)
-                   .attr("class", "agenda");
+  d3.select("body")
+     .append("div")
+     .attr("width", width)
+     .attr("height", height)
+     .attr("class", "agenda");
+  d3.select("body")
+    .append("div")
+    .attr("class", "agendaHeader")
+        .append("text")
 
   var pad = {
               top: height * 0.2,
@@ -833,31 +872,32 @@ const makeHeatGraph = function(data){
             };
 
   const addSlider = function(){
-  var dataTime = d3.range(0, 18).map(function(d) {
-    return new Date(1996 + d, 10, 3);
-  });
+      var dataTime = d3.range(0, 18).map(function(d) {
+        return new Date(1996 + d, 10, 3);
+      });
 
-  var sliderTime = d3.sliderBottom()
-                     .min(d3.min(dataTime))
-                     .max(d3.max(dataTime))
-                     .step(1000 * 60 * 60 * 24 * 365)
-                     .width(parseInt(svg.style("width")) * 0.91)
-                     .tickFormat(d3.timeFormat('%Y'))
-                     .tickValues(dataTime)
-                     .default(new Date(selTime, 10, 3))
-                     .on('onchange', val => {
-                        selTime = parseInt(d3.timeFormat("%Y")(val));
-                        updateHeat();
-                      });
+      var sliderTime = d3.sliderBottom()
+                         .min(d3.min(dataTime))
+                         .max(d3.max(dataTime))
+                         .step(1000 * 60 * 60 * 24 * 365)
+                         .width(parseInt(svg.style("width")) * 0.91)
+                         .tickFormat(d3.timeFormat('%Y'))
+                         .tickValues(dataTime)
+                         .default(new Date(selTime, 10, 3))
+                         .on('onchange', val => {
+                            selTime = parseInt(d3.timeFormat("%Y")(val));
+                            updateHeat();
+                            updateLine()
+                          });
 
-  var gTime = svg.append('svg')
-                 .attr('width', 1000)
-                 .attr('height', 100)
-                 .attr("x", -20)
-                 .attr("y", height - 100)
-                 .append('g')
-                 .attr('transform', 'translate(50,50)');
-  gTime.call(sliderTime);
+      var gTime = svg.append('svg')
+                     .attr('width', 1000)
+                     .attr('height', 100)
+                     .attr("x", -20)
+                     .attr("y", height - 100)
+                     .append('g')
+                     .attr('transform', 'translate(50,50)');
+      gTime.call(sliderTime);
   }
 
   addSlider();
@@ -922,17 +962,16 @@ const makeHeatGraph = function(data){
   xAxisCallHeat = d3.axisTop().ticks(11)
                               .tickFormat(d3.format("d"))
                               .tickSize(0)
-
   // add the x Axis
   svg.append("g")
       .attr("transform", "translate(" + 25 + "," + (pad.top - 5) + ")")
       .attr("class", "heatXAxis");
-  updateHeat();
+  updateHeat(xAxisCallHeat);
 
 }
-const updateHeat = function(){
+const updateHeat = function(xAxisCallHeat){
     svg = d3.select(".heatChart")
-    data = dataGlob[2]
+    // data = dataGlob[2]
 
     var selVar = barSelGenre;
     var width = parseInt(svg.style("width"));
@@ -987,11 +1026,11 @@ const updateHeat = function(){
     placeYLabels();
 
     // when studios
-    var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
+    // var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
 
     var nest = d3.nest()
                       .key(function(d) { return d.genre; })
-                      .entries(data);
+                      .entries(dataGlob[2]);
 
     var genres = nest.map(function(d) { return d.key; });
     // var currentGenreIndex = "Comedy";
@@ -1044,7 +1083,7 @@ const updateHeat = function(){
                                   return colour;
                                   })
       .on("click", function(d){
-                   updateAgenda(d.amount)
+                   updateAgenda(d.amount, d.season, d.year)
                    });
 
       var heatmap = svg.selectAll(".heatYear")
@@ -1065,10 +1104,26 @@ const updateHeat = function(){
        .transition()
        .call(xAxisCallHeat)
 
-
 }
-const updateAgenda = function(entries){
+const updateAgenda = function(entries, season, year){
+      var seasonDict = {
+                        0: "Winter",
+                        1: "Spring",
+                        2: "Summer",
+                        3: "Fall"
+                      }
+
+      d3.select(".agendaHeader")
+        .text(function(d){
+               var title = `The entries from the list from ${year}'s ${seasonDict[season]} season'`
+               return title
+
+       })
+       .attr("text-anchor", "center")
+
     var svg = d3.select(".agenda")
+
+
     svg.selectAll(".agendaEntry")
 					.remove()
 					.exit();
@@ -1084,6 +1139,7 @@ const updateAgenda = function(entries){
     };
 }
 const assignColours = function(){
+    colourLabels = {}
     var color = d3.scaleOrdinal(d3.schemeCategory10);
     var index = 0
     for (genre of Object.keys(dataGlob[1][1])){

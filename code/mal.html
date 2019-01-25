@@ -18,11 +18,13 @@
      <div class="sticky2">
        To use this page you can(not yet) insert your name in the username box
        and press sumbit. This may take a while(up to 20 min.) depending on
-       your list. if you insert "Goblok" you can use my data for the visualizations
+       your list. if you insert "Goblok" you can use my data for the visualizations or if you
+       prefer the data of an acquaintance of mine then you can type in "VellanShadow" and press
+       submit
       </div>
     <div class="nameinsert">Username:<br>
-      <input type="text" name="firstname" value="Goblok">
-      <input type="submit" value="Submit">
+      <input type="text" name="username" value="Goblok">
+      <input type="submit" value="Submit" onclick="updateAll('viaSubmit')">
       <input type="radio" name="listOption" value="2" checked> Completed
       <input type="radio" name="listOption" value="3"> On-Hold
       <input type="radio" name="listOption" value="4"> Dropped
@@ -32,7 +34,7 @@
     <!-- https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518 -->
     <script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
 
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="d3/d3.js"></script>
     <script type ="text/javascript" src="mal.js"></script>
     <div class="lowText">JUST OPEN THE GO*DAMN PENDANT - every Nisekoi watcher</div>

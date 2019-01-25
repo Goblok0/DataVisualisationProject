@@ -15,15 +15,16 @@ from selenium import webdriver
 # https://chromedriver.storage.googleapis.com/index.html?path=2.45/
 browser = webdriver.Chrome()
 
-# username = "VellanShadow"
-username = "Goblok"
+username = "VellanShadow"
+# username = "Goblok"
+# username = "dsafgsa"
 
 
 
 
-OUTPUT_CSV = f"{username}.csv"
-SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
-BACKUP_DIR = os.path.join(SCRIPT_DIR, 'HTML_BACKUPS')
+# OUTPUT_CSV = f"{username}.csv"
+# SCRIPT_DIR = os.path.split(os.path.realpath(__file__))[0]
+# BACKUP_DIR = os.path.join(SCRIPT_DIR, 'HTML_BACKUPS')
 
 def main():
     # corresponding to page: Completed, OnHold, Dropped & PlanToWatch
@@ -33,19 +34,22 @@ def main():
     #                4: "Dropped",
     #                6: "PlanToWatch"
     #              }
-    page_index = [4]
+    # page_index = [4]
     full_anime_list = []
     for index in page_index:
         MAL_URL = f"https://myanimelist.net/animelist/{username}?status={index}"
         source_data = get_source(MAL_URL)
         # Make backup of the IMDB top 250 movies page
-        print('Access MAL page, making backup ...')
+        print('Access MAL page...')
         mal_html = simple_get(MAL_URL)
         mal_dom = BeautifulSoup(source_data)
 
         # extract the top 250 movies
         print('Scraping top 250 page ...')
         url_strings = scrape_mal(mal_dom)
+        if url_strings == "invalid":
+            print("Invalid Username")
+            quit()
         print(len(url_strings))
 
         anime_list = []
@@ -107,6 +111,11 @@ def get_source(MAL_URL):
 
 def scrape_mal(soup):
 
+    try:
+        if soup.find('h1').text.strip() == "Invalid Username Supplied":
+            return "invalid"
+    except:
+        pass
     # print(soup)
     anime_urls = []
     # beginning of the movie link
@@ -125,7 +134,6 @@ def scrape_mal(soup):
         index = url.rfind("/")
         # cuts the string off at index
         url = url[:index]
-        # print(url)
         # creates a usable url
         full_link = base + url
         anime_urls.append(full_link)

@@ -3,7 +3,7 @@ body{
 }
 div.lowText {
   position: absolute;
-  top: 1800;
+  top: 2500;
   left: 500;
   width: 150px;
   padding: 5px;
@@ -60,9 +60,9 @@ svg.barchart{
 div.baroptions{
   position: absolute;
   top: 150px;
-  left: 1250px;
+  left: 1225px;
   width: 300px;
-  height: 100px;
+  height: 150px;
   padding: 5px;
   background-color: grey;
   border: 2px solid #094c95;
@@ -70,7 +70,7 @@ div.baroptions{
 
 svg.linechart{
   position: absolute;
-  top: 1250px;
+  top: 1350px;
   left: 200px;
   width: 800px;
   height: 500px;
@@ -80,7 +80,7 @@ svg.linechart{
 }
 .lineOptions1{
   position: absolute;
-  top: 1250px;
+  top: 1350px;
   left: 1050px;
   width: 110px;
   padding: 5px;
@@ -89,7 +89,7 @@ svg.linechart{
 }
 .lineOptions2{
   position: absolute;
-  top: 1250px;
+  top: 1350px;
   left: 1180px;
   width: 110px;
   padding: 5px;
@@ -98,8 +98,8 @@ svg.linechart{
 }
 svg.heatchart{
   position: absolute;
-  top: 450px;
-  left: 1300px;
+  top: 800px;
+  left: 200px;
   width: 800px;
   height: 500px;
   padding: 5px;
@@ -109,7 +109,18 @@ svg.heatchart{
 }
 div.agenda{
   position: absolute;
-  top: 700px;
+  top: 900px;
+  left: 1050px;
+  width: 300px;
+  /* height: 200px; */
+  color: seashell;
+  padding: 5px;
+  background-color: grey;
+  border: 2px solid #094c95;
+}
+div.agendaHeader{
+  position: absolute;
+  top: 800px;
   left: 1050px;
   width: 300px;
   /* height: 200px; */
@@ -127,14 +138,12 @@ div.col-sm-2{
 }
 .toolTip {
   position: absolute;
-  /* display: none; */
+  display: none;
   min-width: 60px;
   height: auto;
-  /* background: white; */
-  /* opacity: 0.1 */
   border-radius: 5px;
   border: 2px solid blue;
-
+  font-size: 12px;
   padding: 5px;
   text-align: center;
   z-index:99999
@@ -152,4 +161,7 @@ div.col-sm-2{
   position: absolute;
   top: -30px;
   left: -3px; */
+}
+.cBox{
+  z-index: 99999
 }
