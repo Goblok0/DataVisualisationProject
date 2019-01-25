@@ -34,8 +34,8 @@ div.problem{
   padding: 5px;
   background-color: powderblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
-
 div.nameinsert {
   position: absolute;
   top: 62px;
@@ -45,8 +45,17 @@ div.nameinsert {
   padding: 5px;
   background-color: lightblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
-
+div.howto{
+  position: absolute;
+  top: 62;
+  width: 500px;
+  padding: 5px;
+  background-color: powderblue;
+  border: 2px solid #094c95;
+  border-radius: 5px;
+}
 svg.barchart{
   position: absolute;
   top: 150px;
@@ -56,6 +65,7 @@ svg.barchart{
   padding: 5px;
   background-color: lightblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 div.baroptions{
   position: absolute;
@@ -66,6 +76,7 @@ div.baroptions{
   padding: 5px;
   background-color: grey;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 
 svg.linechart{
@@ -77,24 +88,31 @@ svg.linechart{
   padding: 5px;
   background-color: lightblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 .lineOptions1{
   position: absolute;
-  top: 1350px;
+  top: 1400px;
   left: 1050px;
   width: 110px;
   padding: 5px;
-  background-color: grey;
   border: 2px solid #094c95;
+  border-radius: 5px;
+  color: #3d3d3f;
+  background-color: #D3D2B5;
+  /* text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; */
 }
 .lineOptions2{
   position: absolute;
-  top: 1350px;
+  top: 1400px;
   left: 1180px;
   width: 110px;
   padding: 5px;
-  background-color: blue;
   border: 2px solid #094c95;
+  border-radius: 5px;
+  color: grey;
+  background-color: #f6f5f3;
+  /* text-shadow: -1px 0 #76C4AE, 0 1px #76C4AE, 1px 0 #76C4AE, 0 -1px #76C4AE; */
 }
 svg.heatchart{
   position: absolute;
@@ -106,6 +124,7 @@ svg.heatchart{
   background-color: lightblue;
   /* opacity: 0.1 */
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 div.agenda{
   position: absolute;
@@ -113,21 +132,23 @@ div.agenda{
   left: 1050px;
   width: 300px;
   /* height: 200px; */
-  color: seashell;
-  padding: 5px;
-  background-color: grey;
+  padding: 10px;
+  color: #3d3d3f;
+  background-color: #f6f5f3;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 div.agendaHeader{
   position: absolute;
   top: 800px;
   left: 1050px;
   width: 300px;
-  /* height: 200px; */
-  color: seashell;
   padding: 5px;
-  background-color: grey;
+  /* height: 200px; */
+  color: #3d3d3f;
+  background-color: #D3D2B5;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 div.col-sm-2{
   left: 850px;
@@ -156,11 +177,17 @@ div.col-sm-2{
   top: -30px;
   left: 53px;
   /* color: seashell; */
+  border-radius: 5px;
+  color: grey;
+  background-color: #f6f5f3;
 }
 .unCheckAll{
   position: absolute;
   top: -30px;
-  left: -3px; */
+  left: -3px;
+  border-radius: 5px;
+  color: #3d3d3f;
+  background-color: #D3D2B5;
 }
 .cBox{
   z-index: 99999

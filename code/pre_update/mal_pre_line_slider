@@ -862,8 +862,7 @@ const makeHeatGraph = function(data){
      .append("div")
      .attr("width", width)
      .attr("height", height)
-     .attr("class", "agenda")
-
+     .attr("class", "agenda");
   d3.select("body")
     .append("div")
     .attr("class", "agendaHeader")
@@ -1134,7 +1133,7 @@ const updateAgenda = function(entries, season, year){
                          return agendaHeight;;
                        });
     for (entry of entries){
-        svg.append("li")
+        svg.append("p")
           .text(entry)
           .attr("class", "agendaEntry");
     };
