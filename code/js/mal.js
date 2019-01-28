@@ -3,8 +3,8 @@
 To do(-), done(+)  {
   + fix transition of barcharts
   + update line graph
-  - fix genre selection
-  - make agenda visually pleasing
+  + fix genre selection
+  + make agenda visually pleasing
   + interactivity line chart
   - slider influence linechart
   + make genre/studio colours constant
@@ -12,8 +12,8 @@ To do(-), done(+)  {
   ~ make the scraper callable in JS
     - with potential load bar
   + fix heatmap bug
-  - titles
-  - axis titles
+  + titles
+  + axis titles
 */
 
 // credit slider: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
@@ -51,7 +51,7 @@ window.onload = function() {
              });
    d3.selectAll('input[name="listOption"]')
      .on("change", function(d) {
-         updateAll("Newlist")
+         updateAll()
      })
 
 };
@@ -61,6 +61,7 @@ const updateAll = function(via){
       if (via == "viaSubmit"){
          username = d3.select('input[name="username"]').node().value;
       }
+
       listType = parseInt(d3.select('input[name="listOption"]:checked').node().value);;
       var json = `../scraper/data/${username}_${listType}.json`
       if (!fileExists(json)) {
@@ -362,13 +363,6 @@ const makeBarGraph = function(data){
               right: width * 0.1
             };
 
-  // creates the background of the SVG-element
-  // svg.append("rect")
-  //    .attr("width", "100%")
-  //    .attr("height", "100%")
-  //    .attr("fill", "grey")
-  //    .attr("opacity", 0.1);
-
    // creates the scale and axis for the bar chart
    yScaleBar = d3.scaleBand();
    xScaleBar = d3.scaleLinear();
@@ -382,8 +376,29 @@ const makeBarGraph = function(data){
 
   // add the y Axis
   svg.append("g")
-      .attr("transform", "translate(" + pad.left * 0.85 + "," + 0 + ")")
+      .attr("transform", "translate(" + pad.left * 0.9 + "," + 0 + ")")
       .attr("class", "barYAxis");
+
+  // creates the Title
+  svg.append("text")
+     .attr("class", "tLabBar")
+     .attr("y", height * 0.05)
+     .attr("x", width * 0.55)
+     .style("text-anchor", "middle")
+
+  // creates the Y-axis label
+  svg.append("text")
+     .attr("class", "yLabBar")
+     .attr("y", height * 0.075)
+     .attr("x", pad.left * 0.725 )
+     .style("text-anchor", "middle")
+
+  // creates the X-axis label
+  svg.append("text")
+     .attr("class", "xLabBar")
+     .attr("y", height * 0.98)
+     .attr("x", width * 0.55 )
+     .style("text-anchor", "middle");
 
   // adds the options box of the bar graph
   const addOptions = function(){
@@ -459,13 +474,11 @@ const updateBars = function(){
     var svg = d3.select(".barchart");
     var width = parseInt(svg.style("width"));
     var height = parseInt(svg.style("height"));
-    var svgLeft = parseInt(svg.style("left"));
-    var svgTop = parseInt(svg.style("top"));
     var pad = {
                 top: height * 0.1,
                 bottom: height * 0.1,
-                left: width * 0.175,
-                right: width * 0.15
+                left: width * 0.19,
+                right: width * 0.17
               };
     // obtains the selection options from the bar radio buttons
     var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
@@ -515,17 +528,16 @@ const updateBars = function(){
     var colScale = d3.scaleLinear()
                      .domain([0, bigdataMax])
                      .range([d3.rgb("#6e63b1"), d3.rgb('#3058ff')]);
+
     // calls the axisses of the barchart
     yAxisCallBar.scale(yScaleBar);
     xAxisCallBar.scale(xScaleBar);
     svg.select(".barXAxis")
        .transition()
        .call(xAxisCallBar);
-
-
      svg.select(".barYAxis")
-        .style("font-size",  function(d){
-          var size = 400 / data.length
+        .style("font-size",  function(){
+          var size = 300 / data.length
           if (size > 16){
              size = 16
           }
@@ -534,6 +546,48 @@ const updateBars = function(){
         .transition()
         .call(yAxisCallBar);
 
+     svg.selectAll(".tLabBar")
+  			 .text(function(){
+             if (typeVar == 0){
+                 var preTLab = "More Prevalent"
+             }
+             else{
+                var preTLab = "Less Prevalent"
+             }
+             if (dataVar == 0){
+                var tLab = "Genres"
+             }
+             else{
+                var tLab = "Studios"
+             }
+             if (quantVar == 0){
+                var prePreTLab = "Amount"
+             }
+             else{
+                var prePreTLab = "Percentage"
+             }
+             return `The ${prePreTLab} of ${preTLab} ${tLab} within the List`
+         })
+     svg.select(".yLabBar")
+        .text(function(){
+          if (dataVar == 0){
+              var yLab = "|Genres|"
+          }
+          else{
+            var yLab = "|Studios|"
+          }
+          return yLab
+        })
+      svg.select(".xLabBar")
+         .text(function(){
+           if (quantVar == 0){
+               var yLab = "Amount found in the list"
+           }
+           else{
+             var yLab = "Percentage of the total amount in the list"
+           }
+           return yLab
+         })
 
     // selects and creates the bars
     var rects = svg.selectAll("rect")
@@ -544,6 +598,8 @@ const updateBars = function(){
              .on("mouseover", function(d) {
                               d3.select(this)
                                 .style("opacity", 0.5);
+                              var svgLeft = parseInt(svg.style("left"));
+                              var svgTop = parseInt(svg.style("top"));
                               // makes the string that represents the value
                               var amount = Math.round(quant(d[1]) * 100)/100
                               if (quantVar == 0){
@@ -587,38 +643,63 @@ const updateBars = function(){
 }
 // creates the SVG used for the linegraph
 const makeLineGraph = function(data){
-  // defines variables
-  var svg = d3.select("body")
-          .append("svg")
-          .attr("class", "linechart");
-  var width = parseInt(svg.style("width"));
-  var height = parseInt(svg.style("height"));
-  var pad = {
-              top: height * 0.2,
-              bottom: height * 0.1,
-              left: width* 0.15,
-              right: width * 0.05
-            };
+    // defines variables
+    var svg = d3.select("body")
+            .append("svg")
+            .attr("class", "linechart");
+    var width = parseInt(svg.style("width"));
+    var height = parseInt(svg.style("height"));
+    var pad = {
+                top: height * 0.2,
+                bottom: height * 0.1,
+                left: width* 0.15,
+                right: width * 0.05
+              };
 
-  // creates scales and axis
-  yScaleLine = d3.scaleLinear();
-  xScaleLine = d3.scaleLinear();
-  yAxisCall = d3.axisLeft().ticks(10);
-  xAxisCall = d3.axisBottom().ticks(20).tickFormat(d3.format("d"));
-  svg.append("g")
-     .attr("transform", "translate("+ 0 + ","+ height * 0.9 + ")")
-     .attr("class", "lineXAxis");
-  // creates the Y-axis
-  svg.append("g")
-     .attr("transform", "translate("+ (pad.left) + "," + 0 + ")")
-     .attr("class", "lineYAxis");
- // creates the options box for the line chart
- d3.select("body")
-     .append("div")
-     .attr("class", "lineOptions1")
- d3.select("body")
-   .append("div")
-     .attr("class", "lineOptions2");
+    // creates scales and axis
+    yScaleLine = d3.scaleLinear();
+    xScaleLine = d3.scaleLinear();
+    yAxisCall = d3.axisLeft().ticks(10);
+    xAxisCall = d3.axisBottom().ticks(20).tickFormat(d3.format("d"));
+    svg.append("g")
+       .attr("transform", "translate("+ 0 + ","+ height * 0.9 + ")")
+       .attr("class", "lineXAxis");
+    // creates the Y-axis
+    svg.append("g")
+       .attr("transform", "translate("+ (pad.left) + "," + 0 + ")")
+       .attr("class", "lineYAxis");
+    // creates the options box for the line chart
+    d3.select("body")
+       .append("div")
+       .attr("class", "lineOptions1")
+    d3.select("body")
+       .append("div")
+       .attr("class", "lineOptions2");
+
+     // creates the Title
+     svg.append("text")
+        .attr("class", "tLabLine")
+        .attr("y", height * 0.1)
+        .attr("x", width * 0.55)
+        .style("text-anchor", "middle")
+        .text("The Quantity of Genre-Entries over the Years")
+
+     // creates the Y-axis label
+     svg.append("text")
+        .attr("class", "yLabLine")
+        .attr("transform", "rotate(-90)")
+        .attr("y", width * 0.07)
+        .attr("x", 0 - (height * 0.55))
+        .style("text-anchor", "middle")
+        .text("Amount present in list")
+
+     // creates the X-axis label
+     svg.append("text")
+        .attr("class", "xLabLine")
+        .attr("y", height * 0.98)
+        .attr("x", width * 0.55 )
+        .style("text-anchor", "middle")
+        .text("Years");
 
   var lines = svg.append('g')
                  .attr("class", "lines");
@@ -641,6 +722,7 @@ const updateLine = function(via){
                 left: width* 0.15,
                 right: width * 0.05
               };
+
     var genres=document.getElementsByName('lineChecks');
 		var selectedGenres=[];
 		for(var i=0; i<genres.length; i++){
@@ -662,10 +744,6 @@ const updateLine = function(via){
        var lineOpacityOff = 0.25
     }
 
-    // n = 2
-    // slideValue = 2003
-    // lowerBound = slideValue - 5
-    // upperBound = slideValue + 5
     const findLineMax = function(){
         var max = 0;
         for (key of Object.keys(data)){
@@ -718,10 +796,10 @@ const updateLine = function(via){
               svg.append("text")
                 .attr("class", "title-text")
                 .style("fill", colourLabels[d.genre])
-                .text(d.genre)
                 .attr("text-anchor", "middle")
-                .attr("x", width * 0.5)
+                .attr("x", width * 0.9)//
                 .attr("y", height * 0.1)
+                .text(d.genre)
             })
         .on("mouseout", function(d) {
             svg.select(".title-text").remove();
@@ -737,11 +815,6 @@ const updateLine = function(via){
                   .style("stroke-width", "2.5px")
                   .style("cursor", "pointer");
                 var svgLeft = parseInt(svg.style("left"));
-                // console.log(d.years)
-                // tooltip.style("left", Math.round(xScaleLine(d.years.year) + svgLeft))
-                //        .style("top", d3.event.pageY - 70 + "px")
-                //        .style("display", "inline-block")
-                //        .html(d.yearData);
               })
           .on("mouseout", function(d) {
               d3.selectAll(".line")
@@ -869,6 +942,7 @@ const makeHeatGraph = function(data){
     .append("div")
     .attr("class", "agendaHeader")
         .append("text")
+        .text("Try to click on a square")
 
   var pad = {
               top: height * 0.2,
@@ -876,6 +950,27 @@ const makeHeatGraph = function(data){
               left: width* 0.15,
               right: width * 0.1
             };
+  // creates the Title
+  svg.append("text")
+      .attr("class", "tLabHeat")
+      .attr("y", height * 0.05)
+      .attr("x", width * 0.55)
+      .style("text-anchor", "middle")
+   // creates the Y-axis label
+   svg.append("text")
+      .attr("class", "yLabHeat")
+      .attr("transform", "rotate(-90)")
+      .attr("y", width * 0.04)
+      .attr("x", 0 - (height * 0.475))
+      .style("text-anchor", "middle")
+      .text("Seasons")
+   // creates the X-axis label
+   svg.append("text")
+      .attr("class", "xLabHeat")
+      .attr("y", height * 0.125)
+      .attr("x", width * 0.55 )
+      .style("text-anchor", "middle")
+      .text("Years");
 
   const addSlider = function(){
       // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
@@ -1028,6 +1123,11 @@ const updateHeat = function(){
     };
     placeYLabels();
 
+    svg.selectAll(".tLabHeat")
+        .text(function(){
+
+            return `The Distribution of ${barSelGenre} Series between Seasons within ${lowerBound} and ${upperBound}`
+        })
     // when studios
     // var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
 
@@ -1108,23 +1208,20 @@ const updateHeat = function(){
        .call(xAxisCallHeat)
 }
 const updateAgenda = function(entries, season, year){
-      var seasonDict = {
-                        0: "Winter",
-                        1: "Spring",
-                        2: "Summer",
-                        3: "Fall"
-                      }
+    var seasonDict = {
+                      0: "Winter",
+                      1: "Spring",
+                      2: "Summer",
+                      3: "Fall"
+                    }
 
-      d3.select(".agendaHeader")
-        .text(function(d){
-               var title = `The entries from the list from ${year}'s ${seasonDict[season]} season'`
-               return title
-
-       })
-       .attr("text-anchor", "center")
+    d3.select(".agendaHeader")
+      .text(function(d){
+             var title = `The entries from the list from ${year}'s ${seasonDict[season]} season'`
+             return title
+     })
 
     var svg = d3.select(".agenda")
-
 
     svg.selectAll(".agendaEntry")
 					.remove()
@@ -1134,11 +1231,20 @@ const updateAgenda = function(entries, season, year){
                          var agendaHeight = 10 * entries.length
                          return agendaHeight;;
                        });
-    for (entry of entries){
-        svg.append("li")
-          .text(entry)
-          .attr("class", "agendaEntry");
-    };
+    console.log(entries.length);
+    if (entries.length == 0){
+        svg.append("g")
+            .text("------------------No entries in List-----------------")
+            .attr("class", "agendaEntry")
+    }
+    else{
+        for (entry of entries){
+            svg.append("li")
+              .text(entry)
+              .attr("class", "agendaEntry");
+            };
+    }
+
 }
 const assignColours = function(){
     colourLabels = {}

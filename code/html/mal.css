@@ -1,46 +1,28 @@
 body{
-  background-color: lightskyblue
-
-}
-/* .Cirno{
-  position: absolute;
-  top: 380;
-  width: 100px;
-  height: 106px;
-
-  border: 2px solid #094c95;
-  border-radius: 5px; */
+  background-color: #3B8BEB
 }
 .lowText {
   position: absolute;
-  top: 2500;
-  left: 500;
-  width: 150px;
+  top: 1950;
+  left: 580;
+  width: 120px;
   padding: 5px;
   font-size: 10px;
   background-color: powderblue;
   border: 2px solid #094c95;
   border-radius: 5px;
+  text-align: center;
 }
 div.sticky {
-  position: sticky;
-  top: 50;
-  width: 150px;
-  padding: 5px;
-  background-color: powderblue;
-  border: 2px solid #094c95;
-  border-radius: 5px;
-}
-div.sticky2 {
   position: sticky;
   top: 380;
   width: 150px;
   padding: 5px;
-  background-color: powderblue;
+  background-color: #5DA2D5;
   border: 2px solid #094c95;
   border-radius: 5px;
 }
-.sticky2:hover{
+.sticky:hover{
   color: transparent;
   background-image: url("/background/cirno.png");
 }
@@ -49,7 +31,7 @@ div.problem{
   top: 62;
   width: 150px;
   padding: 5px;
-  background-color: powderblue;
+  background-color: #5DA2D5;
   border: 2px solid #094c95;
   border-radius: 5px;
 }
@@ -60,7 +42,7 @@ div.nameinsert {
   width: 600px;
   height: 50px;
   padding: 5px;
-  background-color: lightblue;
+  background-color: #5DA2D5;
   border: 2px solid #094c95;
   border-radius: 5px;
 }
@@ -88,14 +70,22 @@ div.baroptions{
   position: absolute;
   top: 150px;
   left: 1225px;
-  width: 300px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   padding: 5px;
-  background-color: grey;
+  background-color: #5DA2D5;
   border: 2px solid #094c95;
   border-radius: 5px;
 }
-
+.barXAxis{
+    font-size: 14px;
+}
+.yLabBar{
+    font-size: 20px;
+}
+.tLabBar{
+    font-size: 20px;
+}
 svg.linechart{
   position: absolute;
   top: 1350px;
@@ -115,8 +105,8 @@ svg.linechart{
   padding: 5px;
   border: 2px solid #094c95;
   border-radius: 5px;
-  color: #3d3d3f;
-  background-color: #D3D2B5;
+  /* color: #3d3d3f; */
+  background-color:#5DA2D5;
   /* text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; */
 }
 .lineOptions2{
@@ -127,9 +117,21 @@ svg.linechart{
   padding: 5px;
   border: 2px solid #094c95;
   border-radius: 5px;
-  color: grey;
-  background-color: #f6f5f3;
+  color: #D1D7E0;
+  background-color: #4D6D9A;
   /* text-shadow: -1px 0 #76C4AE, 0 1px #76C4AE, 1px 0 #76C4AE, 0 -1px #76C4AE; */
+}
+.lineXAxis{
+    font-size: 12px;
+}
+.lineYAxis{
+    font-size: 14px;
+}
+.yLabLine{
+    font-size: 20px;
+}
+.tLabLine{
+    font-size: 20px;
 }
 svg.heatchart{
   position: absolute;
@@ -150,22 +152,23 @@ div.agenda{
   width: 300px;
   /* height: 200px; */
   padding: 10px;
-  color: #3d3d3f;
-  background-color: #f6f5f3;
+  /* color: #D1D7E0; */
+  background-color: #5DA2D5;
   border: 2px solid #094c95;
   border-radius: 5px;
 }
 div.agendaHeader{
   position: absolute;
-  top: 800px;
-  left: 1050px;
-  width: 300px;
+  top: 830px;
+  left: 1110px;
+  width: 200px;
   padding: 5px;
   /* height: 200px; */
-  color: #3d3d3f;
-  background-color: #D3D2B5;
+  color: #D1D7E0;
+  background-color:#4D6D9A;
   border: 2px solid #094c95;
   border-radius: 5px;
+  text-align: center;
 }
 div.col-sm-2{
   left: 850px;
@@ -181,6 +184,7 @@ div.col-sm-2{
   height: auto;
   border-radius: 5px;
   border: 2px solid blue;
+  background-color: lightblue;
   font-size: 12px;
   padding: 5px;
   text-align: center;
@@ -195,17 +199,17 @@ div.col-sm-2{
   left: 53px;
   /* color: seashell; */
   border-radius: 5px;
-  color: grey;
-  background-color: #f6f5f3;
+  color: #D1D7E0;
+  background-color: #4D6D9A;
 }
 .unCheckAll{
   position: absolute;
   top: -30px;
   left: -3px;
   border-radius: 5px;
-  color: #3d3d3f;
-  background-color: #D3D2B5;
+  /* color: #3d3d3f; */
+  background-color: #5DA2D5;
 }
-.cBox{
-  z-index: 99999
+.title-text{
+  text-shadow: -1px 0 black;
 }
