@@ -1,7 +1,17 @@
 body{
   background-color: lightskyblue
+
 }
-div.lowText {
+/* .Cirno{
+  position: absolute;
+  top: 380;
+  width: 100px;
+  height: 106px;
+
+  border: 2px solid #094c95;
+  border-radius: 5px; */
+}
+.lowText {
   position: absolute;
   top: 2500;
   left: 500;
@@ -10,14 +20,16 @@ div.lowText {
   font-size: 10px;
   background-color: powderblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 div.sticky {
   position: sticky;
-  top: 20;
+  top: 50;
   width: 150px;
   padding: 5px;
   background-color: powderblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
 }
 div.sticky2 {
   position: sticky;
@@ -26,6 +38,11 @@ div.sticky2 {
   padding: 5px;
   background-color: powderblue;
   border: 2px solid #094c95;
+  border-radius: 5px;
+}
+.sticky2:hover{
+  color: transparent;
+  background-image: url("/background/cirno.png");
 }
 div.problem{
   position: absolute;

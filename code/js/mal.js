@@ -1,15 +1,15 @@
 
 /*
 To do(-), done(+)  {
-  - fix transition of barcharts
-  - update line graph
+  + fix transition of barcharts
+  + update line graph
   - fix genre selection
   - make agenda visually pleasing
   + interactivity line chart
   - slider influence linechart
-  - make genre/studio colours constant
+  + make genre/studio colours constant
   + make the other lists selectable
-  - make the scraper callable in JS
+  ~ make the scraper callable in JS
     - with potential load bar
   + fix heatmap bug
   - titles
@@ -33,7 +33,7 @@ window.onload = function() {
     username = d3.select('input[name="username"]').node().value;
     var listType = parseInt(d3.select('input[name="listOption"]:checked').node().value);;
     // decodes the JSON file
-    var request = [d3.json(`data/${username}_${listType}.json`)];
+    var request = [d3.json(`../scraper/data/${username}_${listType}.json`)];
     // ensures that all data is loaded properly before calling any functions
     Promise.all(request).then(function(response) {
 
@@ -62,15 +62,16 @@ const updateAll = function(via){
          username = d3.select('input[name="username"]').node().value;
       }
       listType = parseInt(d3.select('input[name="listOption"]:checked').node().value);;
-      var json = `data/${username}_${listType}.json`
+      var json = `../scraper/data/${username}_${listType}.json`
       if (!fileExists(json)) {
           return alert("Invalid Username or List Selection");
       }
-      var request = [d3.json(`data/${username}_${listType}.json`)]
+      var request = [d3.json(json)]
 
       Promise.all(request).then(function(response) {
           console.log(response)
           // preprocesses the data
+
           var barSelGenre = "Comedy"
           preProcess(response);
           assignColours()

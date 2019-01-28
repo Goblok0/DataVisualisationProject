@@ -114,3 +114,6 @@
 * kleine bug met de slider was weer teruggekomen waarbij de default slidernummer niet werd geteken. heb het meegeven van callXaxisHeat weggehaald, heeft de bug en bijbehorende errors opgelost
 * about-HTML pagina toegevoegd, verder nog gespeeld met CSS elementen, kan geaccessed worden linksboven bij de about-link
 * de entries in de agenda zijn listitems, ziet er meer geordend uit
+
+## day 17
+* kleine bug in preprocessing, non-genress zoals "stress" & "upset" worden niet uitgefilterd, mogelijke oplossing is filteren op hoofdletter
