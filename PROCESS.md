@@ -116,4 +116,11 @@
 * de entries in de agenda zijn listitems, ziet er meer geordend uit
 
 ## day 17
-* kleine bug in preprocessing, non-genress zoals "stress" & "upset" worden niet uitgefilterd, mogelijke oplossing is filteren op hoofdletter
+* kleine bug in preprocessing, non-genres zoals "stress" & "upset" worden niet uitgefilterd, mogelijke oplossing is filteren op hoofdletter
+* heb axis-labels neergezet en heb ze dynamisch gemaakt waar relevant
+* heb kleuren schema van dwe layout netjes aangepast
+* "THE STRONGEST" is geimplementeerd wanneer je met je muis over de 2e linkerblok gaat.
+
+## day 18
+* preprocessing is specifieker geworden met non-genres uitfilteren
+* functies zijn in aparte files verdeeld

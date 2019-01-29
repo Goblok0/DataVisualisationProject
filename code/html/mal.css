@@ -24,7 +24,7 @@ div.sticky {
 }
 .sticky:hover{
   color: transparent;
-  background-image: url("/background/cirno.png");
+  background-image: url("/picture/cirno.png");
 }
 div.problem{
   position: absolute;
