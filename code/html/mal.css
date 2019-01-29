@@ -24,7 +24,7 @@ div.sticky {
 }
 .sticky:hover{
   color: transparent;
-  background-image: url("/picture/cirno.png");
+  background-image: url("picture/cirno.png");
 }
 div.problem{
   position: absolute;
@@ -105,9 +105,7 @@ svg.linechart{
   padding: 5px;
   border: 2px solid #094c95;
   border-radius: 5px;
-  /* color: #3d3d3f; */
   background-color:#5DA2D5;
-  /* text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; */
 }
 .lineOptions2{
   position: absolute;
@@ -119,7 +117,6 @@ svg.linechart{
   border-radius: 5px;
   color: #D1D7E0;
   background-color: #4D6D9A;
-  /* text-shadow: -1px 0 #76C4AE, 0 1px #76C4AE, 1px 0 #76C4AE, 0 -1px #76C4AE; */
 }
 .lineXAxis{
     font-size: 12px;
@@ -141,7 +138,6 @@ svg.heatchart{
   height: 500px;
   padding: 5px;
   background-color: lightblue;
-  /* opacity: 0.1 */
   border: 2px solid #094c95;
   border-radius: 5px;
 }
@@ -150,9 +146,7 @@ div.agenda{
   top: 900px;
   left: 1050px;
   width: 300px;
-  /* height: 200px; */
   padding: 10px;
-  /* color: #D1D7E0; */
   background-color: #5DA2D5;
   border: 2px solid #094c95;
   border-radius: 5px;
@@ -163,7 +157,6 @@ div.agendaHeader{
   left: 1110px;
   width: 200px;
   padding: 5px;
-  /* height: 200px; */
   color: #D1D7E0;
   background-color:#4D6D9A;
   border: 2px solid #094c95;

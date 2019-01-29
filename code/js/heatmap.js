@@ -1,14 +1,30 @@
+/*
+Created by: Julian Evalle
+
+This program preprocesses data and creates updateable and interactable heatmap with
+a selection of what to represent
+
+data obtained from crawling a MyAnimeList(MAL) account
+
+credit on how to sort on two variables:
+// https://coderwall.com/p/ebqhca/javascript-sort-by-two-fields
+*/
+
+
 // preprocesses Heatmap data
 const preHeatData = function(data){
     var genreDict = {};
-    var genreDictDays = {}
+    var genreDictDays = {};
+    var lowestYear = 1986
+
     // go through all the data
     for (variable of data){
         var title = variable[0];
         var year = variable[2];
         var season = variable[3];
-        if (year < 1986){
-           continue
+        // filter data outside the range of the heatmap
+        if (year < lowestYear){
+            continue
         }
         // go through all the genres of the entry
         for (genre of variable[8]){
@@ -21,7 +37,7 @@ const preHeatData = function(data){
                genreDict[genre] = {};
             };
             inDict = genreDict[genre];
-            // check of the year has been seen before
+            // check if the year has been seen before within that genre
             if (!(inDict[year])){
                inDict[year] = {};
             };
@@ -34,9 +50,9 @@ const preHeatData = function(data){
         };
     };
     var seasons = ["Winter", "Spring", "Summer", "Fall"];
-    // creates an array with all the possible years that can be found
-    var yearRange = Array.from(new Array(33), (x,i) => i + 1986);
-    // fill up the empty years and empty seasons
+    // creates an array with all the possible years will be represented in the heatmap
+    var yearRange = Array.from(new Array(33), (x,i) => i + lowestYear);
+    // fill up the missing years and missing seasons with an empty array
     for (year of yearRange){
         for (genre of Object.keys(genreDict)){
             if(!genreDict[genre][year]){
@@ -50,13 +66,13 @@ const preHeatData = function(data){
             };
         };
     };
-    // reorder the data
+    // reorder the data to {genre:,year:,season:,amount:}
     var genreList = [];
     for (genre of Object.keys(genreDict)){
         var inGenre = genreDict[genre];
         for (year of Object.keys(inGenre)){
             var inYear = inGenre[year];
-            // check in which season corresponds and replace it with a Number
+            // check to which season the entry corresponds and replace it with a number
             // usable in the heatmap
             for (season of Object.keys(inYear)){
                 var heatEntry = {};
@@ -84,55 +100,68 @@ const preHeatData = function(data){
 }
 // creates the SVG for the heatmap
 const makeHeatGraph = function(data){
-  svg = d3.select("body")
+    makeHeatLegend;
+    // create svg and define dimensions
+    svg = d3.select("body")
           .append("svg")
           .attr("class", "heatchart");
+    var width = parseInt(svg.style("width"));
+    var height = parseInt(svg.style("height"));
+    var pad = {
+                top: height * 0.2,
+                bottom: height * 0.4,
+                left: width* 0.15,
+                right: width * 0.1
+              };
 
+    // create agenda and agenda header element
+    d3.select("body")
+       .append("div")
+       .attr("width", width)
+       .attr("height", height)
+       .attr("class", "agenda")
+    d3.select("body")
+      .append("div")
+      .attr("class", "agendaHeader")
+          .append("text")
+          .text("Try to click on a square")
 
-  var width = parseInt(svg.style("width"));
-  var height = parseInt(svg.style("height"));
+    // creates the Title
+    svg.append("text")
+        .attr("class", "tLabHeat")
+        .attr("y", height * 0.05)
+        .attr("x", width * 0.55)
+        .style("text-anchor", "middle")
+    // creates the Y-axis label
+    svg.append("text")
+        .attr("class", "yLabHeat")
+        .attr("transform", "rotate(-90)")
+        .attr("y", width * 0.04)
+        .attr("x", 0 - (height * 0.475))
+        .style("text-anchor", "middle")
+        .text("Seasons")
+    // creates the X-axis label
+    svg.append("text")
+        .attr("class", "xLabHeat")
+        .attr("y", height * 0.125)
+        .attr("x", width * 0.55 )
+        .style("text-anchor", "middle")
+        .text("Years");
 
-  d3.select("body")
-     .append("div")
-     .attr("width", width)
-     .attr("height", height)
-     .attr("class", "agenda")
+    // adds a slider element to the SVG
+    addSlider();
+    // adds a legend to the heatmap
+    makeHeatLegend();
 
-  d3.select("body")
-    .append("div")
-    .attr("class", "agendaHeader")
-        .append("text")
-        .text("Try to click on a square")
-
-  var pad = {
-              top: height * 0.2,
-              bottom: height * 0.4,
-              left: width* 0.15,
-              right: width * 0.1
-            };
-  // creates the Title
-  svg.append("text")
-      .attr("class", "tLabHeat")
-      .attr("y", height * 0.05)
-      .attr("x", width * 0.55)
-      .style("text-anchor", "middle")
-   // creates the Y-axis label
-   svg.append("text")
-      .attr("class", "yLabHeat")
-      .attr("transform", "rotate(-90)")
-      .attr("y", width * 0.04)
-      .attr("x", 0 - (height * 0.475))
-      .style("text-anchor", "middle")
-      .text("Seasons")
-   // creates the X-axis label
-   svg.append("text")
-      .attr("class", "xLabHeat")
-      .attr("y", height * 0.125)
-      .attr("x", width * 0.55 )
-      .style("text-anchor", "middle")
-      .text("Years");
-
-  const addSlider = function(){
+    //creates the x-axis
+    xAxisCallHeat = d3.axisTop().ticks(11)
+                                .tickFormat(d3.format("d"))
+                                .tickSize(0)
+    svg.append("g")
+        .attr("transform", "translate(" + 25 + "," + (pad.top - 5) + ")")
+        .attr("class", "heatXAxis");
+  updateHeat();
+  function addSlider(){
       // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
       var dataTime = d3.range(0, 18).map(function(d) {
         return new Date(1996 + d, 10, 3);
@@ -160,81 +189,67 @@ const makeHeatGraph = function(data){
                      .attr('transform', 'translate(50,50)');
       gTime.call(sliderTime);
   }
-
-  addSlider();
-
-  const makeHeatLegend = function(){
-      // set scaler for alpha colour
-      var colScale = d3.scaleLinear()
-                       .domain([0, 10])
-                       .range([50, 255]);
-      // makes legend data for the chloropleth map
-      var legData = [[0, "<5 watched"],
-                     [5, "~5 watched"],
-                     [10, "+10 watched"]];
-      // creates legend element
-      var legend = svg.selectAll(".legend")
-                      .data(legData)
-                      .enter()
-                      .append("g")
-                      .attr("class", "legend")
-                      .attr("transform", function(d,i) {
-                                         var legX = width * 0.8
-                                         var legY = height * 0.8
-                                         return "translate(" + legX + ","
-                                                             + legY + ")"
-                                         })
-                      .style("font-size","10px");
-      // creates the background for the legend
-      legend.append('rect')
-            .attr('width', 150)
-            .attr('height', legData.length * 20)
-            .attr("x", 0)
-            .attr("y", -20)
-            .style('fill', "white")
-            .attr("opacity", 0.1)
-            .style('stroke', "black");
-      // creates the square-colour symbol in the legend
-      legend.append("rect")
-            .attr('width', 50)
-            .attr('height', 20)
-            .attr('x', 10)
+  function makeHeatLegend (){
+    // set scaler for alpha colour
+    var colScale = d3.scaleLinear()
+                     .domain([0, 10])
+                     .range([50, 255]);
+    // makes legend data for the chloropleth map
+    var legData = [[0, "<5 watched"],
+                   [5, "~5 watched"],
+                   [10, "+10 watched"]];
+    // creates legend element
+    var legend = svg.selectAll(".legend")
+                    .data(legData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "legend")
+                    .attr("transform", function(d,i) {
+                                       var legX = width * 0.8
+                                       var legY = height * 0.8
+                                       return "translate(" + legX + ","
+                                                           + legY + ")"
+                                       })
+                    .style("font-size","10px");
+    // creates the background for the legend
+    legend.append('rect')
+          .attr('width', 150)
+          .attr('height', legData.length * 20)
+          .attr("x", 0)
+          .attr("y", -20)
+          .style('fill', "white")
+          .attr("opacity", 0.1)
+          .style('stroke', "black");
+    // creates the square-colour symbol in the legend
+    legend.append("rect")
+          .attr('width', 50)
+          .attr('height', 20)
+          .attr('x', 10)
+          .attr('y', function(d,i){
+                     var y = i * 15 - 15;
+                     return y;
+                     })
+          .attr("fill", function(d) {
+                        var colValue = colScale(d[0]);
+                        var colour = `rgb(0,0,${colValue})`;
+                        return colour;
+                        });
+      // creates the description beloning to each square symbol in the legend
+      legend.append('text')
+            .attr('x', 70)
             .attr('y', function(d,i){
-                       var y = i * 15 - 15;
+                       var y = i * 15;
                        return y;
                        })
-            .attr("fill", function(d) {
-                          var colValue = colScale(d[0]);
-                          var colour = `rgb(0,0,${colValue})`;
-                          return colour;
-                          });
-        // creates the description beloning to each square symbol in the legend
-        legend.append('text')
-              .attr('x', 70)
-              .attr('y', function(d,i){
-                         var y = i * 15;
-                         return y;
-                         })
-              .text(function(d){
-                    return d[1];
-                    });
-  }
-  makeHeatLegend();
-  xAxisCallHeat = d3.axisTop().ticks(11)
-                              .tickFormat(d3.format("d"))
-                              .tickSize(0)
-  // add the x Axis
-  svg.append("g")
-      .attr("transform", "translate(" + 25 + "," + (pad.top - 5) + ")")
-      .attr("class", "heatXAxis");
-  updateHeat();
+            .text(function(d){
+                  return d[1];
+                  });
+}
 }
 // updates the heatboxes
 const updateHeat = function(){
-    svg = d3.select(".heatChart")
-    // data = dataGlob[2]
-
-    var selVar = barSelGenre;
+    // defines variables and dimensions
+    var svg = d3.select(".heatChart")
     var width = parseInt(svg.style("width"));
     var height = parseInt(svg.style("height"));
     var pad = {
@@ -243,132 +258,121 @@ const updateHeat = function(){
               left: width* 0.15,
               right: width * 0.1
               };
-
+    var wChart = width - pad.left - pad.right;
+    var lowestYear = 1986
     var lowerBound = selTime - 5;
     var upperBound = selTime + 5;
-
     var yList = ["Winter", "Spring", "Summer", "Fall"];
 
+    // defines the axis scales
     var xScaleHeat = d3.scaleLinear()
                    .domain([lowerBound, upperBound])
                    .range([pad.left, width - pad.right]);
     var yScaleHeat = d3.scaleLinear()
                    .domain([0, yList.length])
                    .range([pad.top, height-pad.bottom]);
+    // defines the colour scaler
+    var colScale = d3.scaleLinear()
+                     .domain([0, 10])
+                     .range([50, 255]);
 
-    var wChart = width - pad.left - pad.right;
-    // var hChart = height - pad.bottom - pad.top;
-
+    // creates the yearRange dependant on the slidervalue
     var yearRange = Array.from(new Array(11), (x,i) => i + lowerBound);
-
+    // calculates the width and height of a square
     var gridWidth = Math.floor(wChart / yearRange.length);
 
-    const placeYLabels = function(){
-        svg.selectAll(".heatYLabel")
-           .exit()
-           .remove()
-        var yLabels = svg.selectAll(".heatYLabel")
-                         .data(yList)
-                         .enter()
-                         .append("text")
-                         .attr("class", "heatYLabel")
-                         .text(function(d) {
-                           return d; })
-                         .attr("x", pad.left * 0.9)
-                         .attr("y", function(d,i){
-                                    var yCoor = yScaleHeat(i * 1.2 + 1.1)
-                                    return yCoor
-                                    })
-                         .style("font-size", "15px")
-                         .style("text-anchor", "end");
-    };
+    // places all the Y labels using yScaleHeat
     placeYLabels();
-
+    // creates/updates the title
     svg.selectAll(".tLabHeat")
         .text(function(){
 
             return `The Distribution of ${barSelGenre} Series between Seasons within ${lowerBound} and ${upperBound}`
         })
-    // when studios
-    // var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
 
+    // extracts the selected genre data from the HeatmapData
     var nest = d3.nest()
-                      .key(function(d) { return d.genre; })
-                      .entries(dataGlob[2]);
-
-    var genres = nest.map(function(d) { return d.key; });
-    // var currentGenreIndex = "Comedy";
-    var selectedGenre = nest.find(function(d) {
-                                              return d.key == selVar;
-                                            });
-
+                  .key(function(d){return d.genre;})
+                  .entries(dataGlob[2]);
+    var genres = nest.map(function(d){return d.key;});
+    var selectedGenre = nest.find(function(d){return d.key == barSelGenre;});
     var data = selectedGenre.values;
-    var data = data.slice(((lowerBound - 1986) * 4),((upperBound - 1985)*4));
-    // https://coderwall.com/p/ebqhca/javascript-sort-by-two-fields
+    // isolates the data within the yearrange
+    var data = data.slice(((lowerBound - lowestYear) * 4),((upperBound - lowestYear + 1)*4));
+    // orders the data on year first, season second
     data.sort(function(a, b) {
               return a["year"] - b["year"] || a["season"] - b["season"]
               });
-    var colScale = d3.scaleLinear()
-                    .domain([0, 10])
-                    .range([50, 255]);
 
+    // creates and updates the squares within the heatmap
     var heatmap = svg.selectAll(".heatYear")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("x", function(d) {
-                                var xValue = xScaleHeat(d.year)
-                                return xValue;
-                              })
-      .attr("y", function(d) {
-                                var yValue = yScaleHeat(d.season) * 1.2
-                                return yValue;
-                              })
-      .attr("width", gridWidth)
-      .attr("height", gridWidth)
-      .attr("class", "heatYear")
-      .style("stroke", "white")
-      .on("mouseover", function(d) {
-                       d3.select(this)
-                         .style("opacity", 0.5);
-                       })
-      .on("mouseout", function(d) {
-                      d3.select(this)
-                        .style("opacity", 1.0);
-                      })
-      .style("fill", function(d) {
-                                  if (d.amount.length == 0){
-                                      var colour = "darkgrey";
-                                      return colour
-                                  }
-                                  var colValue = colScale(d.amount.length)
-                                  var colour = `rgb(0,0,${colValue})`
-
-                                  return colour;
-                                  })
-      .on("click", function(d){
-                   updateAgenda(d.amount, d.season, d.year)
-                   });
-
+                      .data(data)
+                      .enter()
+                      .append("rect")
+                        .attr("x", function(d) {
+                                      var xValue = xScaleHeat(d.year)
+                                      return xValue;
+                                   })
+                        .attr("y", function(d) {
+                                      var yValue = yScaleHeat(d.season) * 1.2
+                                      return yValue;
+                                   })
+                        .attr("width", gridWidth)
+                        .attr("height", gridWidth)
+                        .attr("class", "heatYear")
+                        .style("stroke", "white")
+                        .on("mouseover", function(d) {
+                                           d3.select(this)
+                                             .style("opacity", 0.5);
+                                         })
+                        .on("mouseout", function(d) {
+                                          d3.select(this)
+                                            .style("opacity", 1.0);
+                                        })
+                        .on("click", function(d){
+                                       updateAgenda(d.amount, d.season, d.year)
+                                     });
+      // creates the transition of colour within the heatmap
       var heatmap = svg.selectAll(".heatYear")
                        .data(data)
                        .transition()
                        .duration(500)
                        .style("fill", function(d) {
-                                      var colValue = colScale(d.amount.length)
-                                      var colour = `rgb(0,0,${colValue})`
-                                      if (d.amount.length == 0){
-                                          colour = "darkgrey"
-                                      }
-                                      return colour;
-                                    });
+                                        if (d.amount.length == 0){
+                                            colour = "darkgrey"
+                                        }
+                                        else{
+                                          var colValue = colScale(d.amount.length)
+                                          var colour = `rgb(0,0,${colValue})`
+                                        }
+                                        return colour;
+                                      });
+    // updates the xAxis
     xAxisCallHeat.scale(xScaleHeat)
-
     svg.select(".heatXAxis")
        .transition()
        .call(xAxisCallHeat)
+    function placeYLabels(){
+           svg.selectAll(".heatYLabel")
+              .exit()
+              .remove()
+           var yLabels = svg.selectAll(".heatYLabel")
+                            .data(yList)
+                            .enter()
+                            .append("text")
+                            .attr("class", "heatYLabel")
+                            .text(function(d) {
+                              return d; })
+                            .attr("x", pad.left * 0.9)
+                            .attr("y", function(d,i){
+                                       var yCoor = yScaleHeat(i * 1.2 + 1.1)
+                                       return yCoor
+                                       })
+                            .style("font-size", "15px")
+                            .style("text-anchor", "end");
+       };
 }
-// update the agenda
+// updates the agenda
 const updateAgenda = function(entries, season, year){
     var seasonDict = {
                       0: "Winter",
@@ -376,23 +380,24 @@ const updateAgenda = function(entries, season, year){
                       2: "Summer",
                       3: "Fall"
                     }
-
+    // updates the agenda header text
     d3.select(".agendaHeader")
       .text(function(d){
-             var title = `The entries from the list from ${year}'s ${seasonDict[season]} season'`
-             return title
-     })
+               var title = `The entries from the list from ${year}'s ${seasonDict[season]} season'`
+               return title
+           })
 
     var svg = d3.select(".agenda")
-
+    // removes all agendaentries
     svg.selectAll(".agendaEntry")
 					.remove()
 					.exit();
-
+    //adjusts the height to an appropriate length
     svg.attr("height", function(d){
                          var agendaHeight = 10 * entries.length
                          return agendaHeight;;
                        });
+    // check if there is any entries to show in the agenda, else creates a list of the found entries
     if (entries.length == 0){
         svg.append("g")
             .text("------------------No entries in List-----------------")
@@ -401,9 +406,9 @@ const updateAgenda = function(entries, season, year){
     else{
         for (entry of entries){
             svg.append("li")
-              .text(entry)
-              .attr("class", "agendaEntry");
+                .text(entry)
+                .attr("class", "agendaEntry");
             };
-    }
+        }
 
 }

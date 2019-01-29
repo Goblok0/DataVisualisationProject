@@ -5,6 +5,12 @@ To do(-), done(+)  {
   - seperate code
   - give porper credt
   - bugfix, capitalletter
+
+  Repository
+- In (bijna) elke map een README.md toevoegen.
+- JavaScripts in stukjes hakken is fijn voor het overzicht.
+- Binnen data folder sws een README.md, om uit te leggen hoe scripts gebruikt zijn om de data te verzamelen/processen. Aparte folders binnen de Data folder voor code/data zijn mooi. Dan moet je wel os/paths (Python) gebruiken om de data files te kunnen bereiken vanuit de code.
+- Een license toevoegen. 
 */
 
 // credit slider: https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
