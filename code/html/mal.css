@@ -1,18 +1,7 @@
 body{
   background-color: #3B8BEB
 }
-.lowText {
-  position: absolute;
-  top: 1950;
-  left: 580;
-  width: 120px;
-  padding: 5px;
-  font-size: 10px;
-  background-color: powderblue;
-  border: 2px solid #094c95;
-  border-radius: 5px;
-  text-align: center;
-}
+/* preset elements in visualization page */
 div.sticky {
   position: sticky;
   top: 380;
@@ -46,15 +35,63 @@ div.nameinsert {
   border: 2px solid #094c95;
   border-radius: 5px;
 }
+.lowText {
+  position: absolute;
+  top: 1950;
+  left: 580;
+  width: 120px;
+  padding: 5px;
+  font-size: 10px;
+  background-color: powderblue;
+  border: 2px solid #094c95;
+  border-radius: 5px;
+  text-align: center;
+}
+.toolTip {
+  position: absolute;
+  display: none;
+  min-width: 60px;
+  height: auto;
+  border-radius: 5px;
+  border: 2px solid blue;
+  background-color: lightblue;
+  font-size: 12px;
+  padding: 5px;
+  text-align: center;
+  z-index:99999
+}
+/* preset elements in about page */
+div.problemExtend{
+  position: absolute;
+  top: 100;
+  left: 200;
+  width: 400px;
+  padding: 5px;
+  background-color: #5DA2D5;
+  border: 2px solid #094c95;
+  border-radius: 5px;
+}
 div.howto{
   position: absolute;
-  top: 62;
-  width: 500px;
+  top: 100;
+  left: 700;
+  width: 600px;
   padding: 5px;
   background-color: powderblue;
   border: 2px solid #094c95;
   border-radius: 5px;
 }
+div.about{
+  position: absolute;
+  top: 350;
+  left: 200;
+  width: 400px;
+  padding: 5px;
+  background-color: powderblue;
+  border: 2px solid #094c95;
+  border-radius: 5px;
+}
+/* Barchart Elements */
 svg.barchart{
   position: absolute;
   top: 150px;
@@ -86,6 +123,7 @@ div.baroptions{
 .tLabBar{
     font-size: 20px;
 }
+/* Linechart Elements */
 svg.linechart{
   position: absolute;
   top: 1350px;
@@ -96,6 +134,10 @@ svg.linechart{
   background-color: lightblue;
   border: 2px solid #094c95;
   border-radius: 5px;
+}
+.line {
+  stroke-width: 2;
+  fill: none;
 }
 .lineOptions1{
   position: absolute;
@@ -118,6 +160,23 @@ svg.linechart{
   color: #D1D7E0;
   background-color: #4D6D9A;
 }
+.checkAll{
+  position: absolute;
+  top: -30px;
+  left: 53px;
+  /* color: seashell; */
+  border-radius: 5px;
+  color: #D1D7E0;
+  background-color: #4D6D9A;
+}
+.unCheckAll{
+  position: absolute;
+  top: -30px;
+  left: -3px;
+  border-radius: 5px;
+  /* color: #3d3d3f; */
+  background-color: #5DA2D5;
+}
 .lineXAxis{
     font-size: 12px;
 }
@@ -130,6 +189,7 @@ svg.linechart{
 .tLabLine{
     font-size: 20px;
 }
+/* Heatmap Elements */
 svg.heatchart{
   position: absolute;
   top: 800px;
@@ -163,46 +223,10 @@ div.agendaHeader{
   border-radius: 5px;
   text-align: center;
 }
-div.col-sm-2{
-  left: 850px;
-}
-.line {
-  stroke-width: 2;
-  fill: none;
-}
-.toolTip {
-  position: absolute;
-  display: none;
-  min-width: 60px;
-  height: auto;
-  border-radius: 5px;
-  border: 2px solid blue;
-  background-color: lightblue;
-  font-size: 12px;
-  padding: 5px;
-  text-align: center;
-  z-index:99999
-}
 .heatXAxis{
     font-size: 15px;
 }
-.checkAll{
-  position: absolute;
-  top: -30px;
-  left: 53px;
-  /* color: seashell; */
-  border-radius: 5px;
-  color: #D1D7E0;
-  background-color: #4D6D9A;
-}
-.unCheckAll{
-  position: absolute;
-  top: -30px;
-  left: -3px;
-  border-radius: 5px;
-  /* color: #3d3d3f; */
-  background-color: #5DA2D5;
-}
 .title-text{
-  text-shadow: -1px 0 black;
+  text-shadow: -1px 0 darkblue;
+  font-size: 20px;
 }

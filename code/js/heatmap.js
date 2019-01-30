@@ -399,7 +399,7 @@ const updateHeat = function(){
 };
 
 /*
-updates the agenda and agenda header 
+updates the agenda and agenda header
 */
 const updateAgenda = function(entries, season, year){
     var seasonDict = {
@@ -411,7 +411,7 @@ const updateAgenda = function(entries, season, year){
     // updates the agenda header text
     d3.select(".agendaHeader")
       .text(function(d){
-               var title = "The entries from the list from" +
+               var title = "The entries from the list from " +
                            `${year}'s ${seasonDict[season]} season`;
                return title;
             });
