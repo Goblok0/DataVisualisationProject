@@ -6,15 +6,16 @@ a selection of what to represent
 
 data obtained from crawling a MyAnimeList(MAL) account
 
-Credit to find value of all checkboxes
+Credit to find value of all checkboxes function
 //https://www.includehelp.com/code-snippets/javascript-print-value-of-all-checked-selected-checkboxes.aspx
 
 Credit to multi line chart code:
 https://codepen.io/zakariachowdhury/pen/JEmjwq
 */
 
-
-// preprocesses linechart data
+/*
+preprocesses the data to an array usable by the linechart
+*/
 const preLineData = function(data){
     var genreDict = {};
 
@@ -23,14 +24,14 @@ const preLineData = function(data){
         var title = variable[0];
         var year = variable[2];
         if ((year < 1986) || (year == "unknown") || ("NaN" == String(parseInt(year)))){
-           continue
-        }
+           continue;
+        };
         // goes through each genre in the entry
         for (genre of variable[8]){
             // check if the data is relevant
             if ((genre.length > 13) || genre[0] == genre[0].toLowerCase()
                  || ((genre.includes("-")) && genre != "Sci-Fi")){
-                continue
+                continue;
             };
             // check if genre has been seen before
             if (!(genreDict[genre])){
@@ -77,7 +78,10 @@ const preLineData = function(data){
     };
     return [lineData, specLineData];
 }
-// creates the SVG used for the linegraph
+
+/*
+creates the SVG and elements used for the linegraph
+*/
 const makeLineGraph = function(data){
     // creates SVG and defines dimensions
     var svg = d3.select("body")
@@ -95,7 +99,7 @@ const makeLineGraph = function(data){
     // creates scales and axis
     yScaleLine = d3.scaleLinear();
     xScaleLine = d3.scaleLinear();
-    yAxisCallLine = d3.axisLeft()
+    yAxisCallLine = d3.axisLeft();
     xAxisCallLine = d3.axisBottom()
                       .ticks(20).tickFormat(d3.format("d"));
     // creates x-axis
@@ -109,7 +113,7 @@ const makeLineGraph = function(data){
     // creates the option boxes for the line chart
     d3.select("body")
        .append("div")
-        .attr("class", "lineOptions1")
+        .attr("class", "lineOptions1");
     d3.select("body")
        .append("div")
         .attr("class", "lineOptions2");
@@ -141,13 +145,19 @@ const makeLineGraph = function(data){
                    .attr("class", "lines");
     updateLine();
 };
-// updates the line and axislabels
+
+/*
+updates the line and axislabels
+*/
 const updateLine = function(via){
+    findCheckedBoxes;
     findLineMax;
+    yTickSize;
+
     // check if the checkboxes need to be updated
     if (via != "viaCheckBox"){
        updateLOptions();
-    }
+    };
     // selects linechartSVG and defines dimensions
     var svg = d3.select(".linechart");
     var width = parseInt(svg.style("width"));
@@ -158,38 +168,27 @@ const updateLine = function(via){
                 left: width* 0.15,
                 right: width * 0.05
               };
-
-    // finds all checkboxes
-    var genres=document.getElementsByName('lineChecks');
-    // finds all checked checkboxes
-    var selectedGenres=[];
-		for (var i=0; i<genres.length; i++){
-        // check if element is checkbox and if checked
-        if(genres[i].type=='checkbox' && genres[i].checked==true)
-          selectedGenres.push(genres[i].value);
-		};
-    // extracts all genre data selected in the checkboxes
-    var data = []
-    for (genre of selectedGenres){
-        data.push(dataGlob[1][1][genre])
-    }
+    // finds all checked checkboxes and gets the data according to it
+    var data = findCheckedBoxes();
 
     // alter lineopacity depending on the number of selected genres
     if (data.length < 6){
-        var lineOpacityOn = 0.9
-        var lineOpacityOff = 0.8
+        var lineOpacityOn = 0.9;
+        var lineOpacityOff = 0.8;
     }
     else{
-        var lineOpacityOn = 0.85
-        var lineOpacityOff = 0.25
-    }
+        var lineOpacityOn = 0.85;
+        var lineOpacityOff = 0.25;
+    };
+
     // get the value of the selected genre with the highest maximum value
     var max = findLineMax();
+
     // defines the scalers for the axis
     yScaleLine.domain([0, max])
-              .range([height - pad.bottom, pad.top])
+              .range([height - pad.bottom, pad.top]);
     xScaleLine.domain([1986, 2019])
-              .range([pad.left, width - pad.right])
+              .range([pad.left, width - pad.right]);
     yAxisCallLine.ticks(yTickSize())
                  .scale(yScaleLine);
     xAxisCallLine.scale(xScaleLine);
@@ -209,7 +208,7 @@ const updateLine = function(via){
                 })
                 .y(function(d){
                     return yScaleLine(d.yearData.length)
-                })
+                });
    // remove alle lines
    svg.select(".lines").remove()
    var lines = svg.append('g')
@@ -218,27 +217,27 @@ const updateLine = function(via){
    lines.selectAll(".line-group")
         .data(data).enter()
         .append("g")
-        .attr('class', 'line-group')
-        .on("mouseover", function(d, i) {
-              // create text box which shows what genre the lien represents
-              svg.append("text")
-                .attr("class", "title-text")
-                .style("fill", colourLabels[d.genre])
-                .attr("text-anchor", "middle")
-                .attr("x", width * 0.9)
-                .attr("y", height * 0.1)
-                .text(d.genre)
+          .attr('class', 'line-group')
+          .on("mouseover", function(d, i) {
+                // create text box which shows what genre the lien represents
+                svg.append("text")
+                    .attr("class", "title-text")
+                    .style("fill", colourLabels[d.genre])
+                    .attr("text-anchor", "middle")
+                    .attr("x", width * 0.9)
+                    .attr("y", height * 0.1)
+                    .text(d.genre);
+              })
+          .on("mouseout", function(d) {
+              // removes created text box
+              svg.select(".title-text").remove();
             })
-        .on("mouseout", function(d) {
-            // removes created text box
-            svg.select(".title-text").remove();
-          })
         .append('path')
           .attr('class', 'line')
           .on("mouseover", function(d) {
                 // lowers opacity of all lines which are not under the mouse
                 d3.selectAll('.line')
-          					.style('opacity', "0.1");
+          				.style('opacity', "0.1");
                 d3.select(this)
                   .style('opacity', lineOpacityOn)
                   .style("stroke-width", "2.5px")
@@ -248,28 +247,49 @@ const updateLine = function(via){
           .on("mouseout", function(d) {
               // returns the opacity of all lines to normal
               d3.selectAll(".line")
-        					.style('opacity', lineOpacityOff);
+        				.style('opacity', lineOpacityOff);
               d3.select(this)
                 .style("stroke-width", "1.5px")
                 .style("cursor", "none");
               })
           .on("click", function(d){
-                           // updates the heatchart to clicked genre
-                           var dataVar = parseInt(d3.select('input[name="barData"]:checked').node().value);
-                           if (dataVar == 0){
-                               barSelGenre = d.genre
-                               updateHeat()
-                           }
+                       // updates the heatchart to clicked genre
+                       var dataVar = parseInt(d3.select('input[name="barData"]:checked')
+                                                .node().value);
+                       if (dataVar == 0){
+                           barSelGenre = d.genre;
+                           updateHeat();
+                       };
                        })
           .attr('d', function(d){
-                      return line(d.years)
+                      return line(d.years);
                     })
           .style('stroke', function(d){
                            var colour = colourLabels[d.genre];
                            return colour;
                  })
-          .style('opacity', lineOpacityOff)
+          .style('opacity', lineOpacityOff);
 
+    // finds the data of all checked checkboxes
+    function findCheckedBoxes(){
+        // credit: https://www.includehelp.com/code-snippets/javascript-print-value-of-all-checked-selected-checkboxes.aspx
+        // finds all checkboxes
+        var genres=document.getElementsByName('lineChecks');
+        // finds and collect the values of all checked checkboxes
+        var selectedGenres=[];
+        for (var i=0; i<genres.length; i++){
+            // check if element is checkbox and if checked
+            if(genres[i].type=='checkbox' && genres[i].checked==true)
+              selectedGenres.push(genres[i].value);
+        };
+
+        // extracts all genre data selected in the checkboxes
+        var data = [];
+        for (genre of selectedGenres){
+            data.push(dataGlob[1][1][genre])
+        };
+        return data;
+   };
    // finds the max values of all checked genres together
    function findLineMax(){
        var max = 0;
@@ -282,84 +302,57 @@ const updateLine = function(via){
           // checks if found max is higher than the previously highest found max
           if (genreMax > max){
               max = genreMax;
-          }
-        }
+          };
+        };
         return max;
    };
    // creates a custom ticksize depending on how large or small the data is
    function yTickSize(){
-                   var ticks = max%10
-                   // check if there's not enough ticks
-                   if ((max>10) && (ticks<5)){
-                       ticks = 5
-                   }
-                   // prevents non integers to appear as axis-label
-                   else if((ticks == max) || (ticks == 0)){
-                       ticks = max
-                   }
-                   return ticks
-   }
-}
-// updates the Line chart checkboxes
+       var ticks = max%10;
+       // check if there's not enough ticks
+       if ((max>10) && (ticks<5)){
+           ticks = 5;
+       }
+       // prevents non integers to appear as axis-label
+       else if((ticks == max) || (ticks == 0)){
+           ticks = max;
+       };
+       return ticks;
+   };
+};
+
+/*
+updates the Line chart checkboxes and option elements
+*/
 const updateLOptions = function(){
+  updateCheckBoxes;
+  data = dataGlob[1][1];
+  // sorts the genres alphabetically
+  var foundGenres = Object.keys(data);
+  foundGenres.sort(function(a, b) {
+                   return d3.ascending(a[0], b[0]);
+                   });
+  // split the list in two
+  var genres2 = foundGenres.splice(foundGenres.length/2);
+  // the data to go through, [0] is null, due to .lineOption1 and
+  // .lineOption2 being more comprehensible and less confusing element names
+  var foundGenreList = [null, foundGenres, genres2];
+  // go through the foundGenrelist with data and update the checkboxes
+  updateCheckBoxes();
 
-    data = dataGlob[1][1]
-    // sorts the genres alphabetically
-    var foundGenres = Object.keys(data)
-    foundGenres.sort(function(a, b) {
-                     return d3.ascending(a[0], b[0])
-                     });
-    // split the list in two
-    var genres2 = foundGenres.splice(foundGenres.length/2)
-    // the data to go through, [0] is null, due to div.option1 and
-    // div.option2 being more comprehensible and less confusing element names
-    var foundGenreList = [null, foundGenres, genres2]
-    // go through the foundGenrelist with data and update the checkboxes
-    for (i = 1; i < 3; i++){
-        foundGenres = foundGenreList[i]
-        //select specific element with linechart checkboxes
-        lOptions = d3.select(`.lineOptions${i}`)
-        // alter height of the box
-        lOptions.attr("height", function(d){
-                           var height = 10 * foundGenres.length
-                           return height;;
-                           });
-        // remove all elements within the element
-        lOptions.selectAll("*").remove()
-
-        // creates the divs to pair the checkboxes and labels
-        var labels = lOptions.selectAll("input")
-                              .data(foundGenres)
-                              .enter()
-                              .append("div")
-        // creates the checkbox within the its resective div
-        labels.append("input")
-               .attr("type", "checkbox")
-               .attr("name", "lineChecks")
-               .attr("class", "cBox")
-               .attr("value", function(d){return d})
-               .property("checked", true)
-               .on("change", function(d){updateLine("viaCheckBox");});
-        // creates the label of the checkbox within its respective div
-        labels.append("label")
-               .attr("name", "lineLabels")
-               .attr("class", "cBoxLabel")
-               .text(function(d,i){
-                     return d});
-     }
   // creates the buttons for check/uncheck all
   // has to be redone at every call of this function due to checkbox bugs
-   d3.select(`.lineOptions1`)
-      .append("label")
-      .append("input")
-       .attr("type", "submit")
-       .attr("class", "checkAll")
-       .attr("value", "check all")
-       .on("click", function(d){
-                    d3.selectAll("input[type=checkbox]")
-                       .property("checked", true);
-                    updateLine("viaCheckBox")
-                    })
+  d3.select(`.lineOptions1`)
+     .append("label")
+     .append("input")
+      .attr("type", "submit")
+      .attr("class", "checkAll")
+      .attr("value", "check all")
+      .on("click", function(d){
+                   d3.selectAll("input[type=checkbox]")
+                     .property("checked", true);
+                   updateLine("viaCheckBox")
+                   });
    d3.select(`.lineOptions2`)
      .append("label")
      .append("input")
@@ -370,5 +363,42 @@ const updateLOptions = function(){
                    d3.selectAll("input[type=checkbox]")
                       .property("checked", false);
                    updateLine("viaCheckBox")
-       })
-}
+                   });
+
+   // removes the divs in the option elements of the linechart and replaces
+   // them with updated genre checkboxes
+   function updateCheckBoxes(){
+       for (i = 1; i < 3; i++){
+           foundGenres = foundGenreList[i];
+           //select specific element with linechart checkboxes
+           lOptions = d3.select(`.lineOptions${i}`);
+           // alter height of the box
+           lOptions.attr("height", function(d){
+                              var height = 10 * foundGenres.length;
+                              return height;
+                              });
+           // remove all elements within the element
+           lOptions.selectAll("*").remove();
+
+           // creates the divs to pair the checkboxes and labels
+           var labels = lOptions.selectAll("input")
+                                 .data(foundGenres)
+                                 .enter()
+                                 .append("div");
+           // creates the checkbox within the its respective div
+           labels.append("input")
+                  .attr("type", "checkbox")
+                  .attr("name", "lineChecks")
+                  .attr("class", "cBox")
+                  .attr("value", function(d){return d})
+                  .property("checked", true)
+                  .on("change", function(d){updateLine("viaCheckBox");});
+           // creates the label of the checkbox within its respective div
+           labels.append("label")
+                  .attr("name", "lineLabels")
+                  .attr("class", "cBoxLabel")
+                  .text(function(d,i){
+                        return d});
+        };
+   };
+};

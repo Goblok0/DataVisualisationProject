@@ -7,15 +7,20 @@ a selection of what to represent
 data obtained from crawling a MyAnimeList(MAL) account
 
 credit on how to sort on two variables:
-// https://coderwall.com/p/ebqhca/javascript-sort-by-two-fields
+- https://coderwall.com/p/ebqhca/javascript-sort-by-two-fields
+
+credit to slider code:
+- https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
 */
 
 
-// preprocesses Heatmap data
+/*
+preprocesses the data to an array usable by the heatmap
+*/
 const preHeatData = function(data){
     var genreDict = {};
     var genreDictDays = {};
-    var lowestYear = 1986
+    var lowestYear = 1986;
 
     // go through all the data
     for (variable of data){
@@ -24,27 +29,27 @@ const preHeatData = function(data){
         var season = variable[3];
         // filter data outside the range of the heatmap
         if (year < lowestYear){
-            continue
-        }
+            continue;
+        };
         // go through all the genres of the entry
         for (genre of variable[8]){
             // check if data is relevant
             if ((genre == "unknown") || (season == "unknown")){
-                continue
+                continue;
             };
             // check if the genre has been seen before
             if (!(genreDict[genre])){
-               genreDict[genre] = {};
+                genreDict[genre] = {};
             };
             inDict = genreDict[genre];
             // check if the year has been seen before within that genre
             if (!(inDict[year])){
-               inDict[year] = {};
+                inDict[year] = {};
             };
             inYear = inDict[year];
             // chech if the season within that year has been seen before
             if (!(inYear[season])){
-               inYear[season] = [];
+                inYear[season] = [];
             };
             inYear[season].push(title);
         };
@@ -93,12 +98,14 @@ const preHeatData = function(data){
                 heatEntry["amount"] = inYear[season];
                 genreList.push(heatEntry);
               };
-
             };
         };
     return genreList;
 }
-// creates the SVG for the heatmap
+
+/*
+creates the SVG and elements for the heatmap
+*/
 const makeHeatGraph = function(data){
     makeHeatLegend;
     // create svg and define dimensions
@@ -116,22 +123,22 @@ const makeHeatGraph = function(data){
 
     // create agenda and agenda header element
     d3.select("body")
-       .append("div")
+      .append("div")
        .attr("width", width)
        .attr("height", height)
-       .attr("class", "agenda")
+       .attr("class", "agenda");
     d3.select("body")
       .append("div")
-      .attr("class", "agendaHeader")
-          .append("text")
-          .text("Try to click on a square")
+       .attr("class", "agendaHeader")
+      .append("text")
+       .text("Try to click on a square");
 
     // creates the Title
     svg.append("text")
         .attr("class", "tLabHeat")
         .attr("y", height * 0.05)
         .attr("x", width * 0.55)
-        .style("text-anchor", "middle")
+        .style("text-anchor", "middle");
     // creates the Y-axis label
     svg.append("text")
         .attr("class", "yLabHeat")
@@ -139,7 +146,7 @@ const makeHeatGraph = function(data){
         .attr("y", width * 0.04)
         .attr("x", 0 - (height * 0.475))
         .style("text-anchor", "middle")
-        .text("Seasons")
+        .text("Seasons");
     // creates the X-axis label
     svg.append("text")
         .attr("class", "xLabHeat")
@@ -156,17 +163,19 @@ const makeHeatGraph = function(data){
     //creates the x-axis
     xAxisCallHeat = d3.axisTop().ticks(11)
                                 .tickFormat(d3.format("d"))
-                                .tickSize(0)
+                                .tickSize(0);
     svg.append("g")
         .attr("transform", "translate(" + 25 + "," + (pad.top - 5) + ")")
         .attr("class", "heatXAxis");
   updateHeat();
+
+  // creates the slider element which can influence the heatmap
   function addSlider(){
       // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
       var dataTime = d3.range(0, 18).map(function(d) {
         return new Date(1996 + d, 10, 3);
       });
-
+      // creates the SliderElement
       var sliderTime = d3.sliderBottom()
                          .min(d3.min(dataTime))
                          .max(d3.max(dataTime))
@@ -178,8 +187,8 @@ const makeHeatGraph = function(data){
                          .on('onchange', val => {
                             selTime = parseInt(d3.timeFormat("%Y")(val));
                             updateHeat();
-                            // updateLine()
                           });
+      // create element in which the slider can be called upon
       var gTime = svg.append('svg')
                      .attr('width', 1000)
                      .attr('height', 100)
@@ -189,6 +198,8 @@ const makeHeatGraph = function(data){
                      .attr('transform', 'translate(50,50)');
       gTime.call(sliderTime);
   }
+
+  // creates the legend of the heatmap
   function makeHeatLegend (){
     // set scaler for alpha colour
     var colScale = d3.scaleLinear()
@@ -244,9 +255,12 @@ const makeHeatGraph = function(data){
             .text(function(d){
                   return d[1];
                   });
-}
-}
-// updates the heatboxes
+  };
+};
+
+/*
+updates the heatmap
+*/
 const updateHeat = function(){
     // defines variables and dimensions
     var svg = d3.select(".heatChart")
@@ -259,10 +273,19 @@ const updateHeat = function(){
               right: width * 0.1
               };
     var wChart = width - pad.left - pad.right;
-    var lowestYear = 1986
+    var lowestYear = 1986;
     var lowerBound = selTime - 5;
     var upperBound = selTime + 5;
     var yList = ["Winter", "Spring", "Summer", "Fall"];
+
+    // prevents error message during initialization
+    if (barSelGenre == undefined){
+        svg.select(".tLabHeat")
+            .text(function(){
+                return "Click on a Genre-Bar in the BarChart";
+            });
+        return;
+    };
 
     // defines the axis scales
     var xScaleHeat = d3.scaleLinear()
@@ -284,11 +307,10 @@ const updateHeat = function(){
     // places all the Y labels using yScaleHeat
     placeYLabels();
     // creates/updates the title
-    svg.selectAll(".tLabHeat")
+    svg.select(".tLabHeat")
         .text(function(){
-
             return `The Distribution of ${barSelGenre} Series between Seasons within ${lowerBound} and ${upperBound}`
-        })
+        });
 
     // extracts the selected genre data from the HeatmapData
     var nest = d3.nest()
@@ -310,11 +332,11 @@ const updateHeat = function(){
                       .enter()
                       .append("rect")
                         .attr("x", function(d) {
-                                      var xValue = xScaleHeat(d.year)
+                                      var xValue = xScaleHeat(d.year);
                                       return xValue;
                                    })
                         .attr("y", function(d) {
-                                      var yValue = yScaleHeat(d.season) * 1.2
+                                      var yValue = yScaleHeat(d.season) * 1.2;
                                       return yValue;
                                    })
                         .attr("width", gridWidth)
@@ -330,7 +352,7 @@ const updateHeat = function(){
                                             .style("opacity", 1.0);
                                         })
                         .on("click", function(d){
-                                       updateAgenda(d.amount, d.season, d.year)
+                                       updateAgenda(d.amount, d.season, d.year);
                                      });
       // creates the transition of colour within the heatmap
       var heatmap = svg.selectAll(".heatYear")
@@ -339,69 +361,76 @@ const updateHeat = function(){
                        .duration(500)
                        .style("fill", function(d) {
                                         if (d.amount.length == 0){
-                                            colour = "darkgrey"
+                                            colour = "darkgrey";
                                         }
                                         else{
-                                          var colValue = colScale(d.amount.length)
-                                          var colour = `rgb(0,0,${colValue})`
-                                        }
+                                          var colVal = colScale(d.amount.length);
+                                          var colour = `rgb(0,0,${colVal})`;
+                                        };
                                         return colour;
                                       });
     // updates the xAxis
-    xAxisCallHeat.scale(xScaleHeat)
+    xAxisCallHeat.scale(xScaleHeat);
     svg.select(".heatXAxis")
        .transition()
-       .call(xAxisCallHeat)
+       .call(xAxisCallHeat);
+
+    // places the y-labels next to its respective row
     function placeYLabels(){
-           svg.selectAll(".heatYLabel")
-              .exit()
-              .remove()
-           var yLabels = svg.selectAll(".heatYLabel")
-                            .data(yList)
-                            .enter()
-                            .append("text")
-                            .attr("class", "heatYLabel")
-                            .text(function(d) {
-                              return d; })
-                            .attr("x", pad.left * 0.9)
-                            .attr("y", function(d,i){
-                                       var yCoor = yScaleHeat(i * 1.2 + 1.1)
-                                       return yCoor
-                                       })
-                            .style("font-size", "15px")
-                            .style("text-anchor", "end");
-       };
-}
-// updates the agenda
+        // removes all previously found y-labels
+        svg.selectAll(".heatYLabel")
+           .exit()
+           .remove();
+        // places the y-labels
+        var yLabels = svg.selectAll(".heatYLabel")
+                         .data(yList)
+                         .enter()
+                         .append("text")
+                          .attr("class", "heatYLabel")
+                          .text(function(d){return d;})
+                          .attr("x", pad.left * 0.9)
+                          .attr("y", function(d,i){
+                                     var yCoor = yScaleHeat(i * 1.2 + 1.1)
+                                     return yCoor
+                                     })
+                         .style("font-size", "15px")
+                         .style("text-anchor", "end");
+    };
+};
+
+/*
+updates the agenda and agenda header 
+*/
 const updateAgenda = function(entries, season, year){
     var seasonDict = {
-                      0: "Winter",
-                      1: "Spring",
-                      2: "Summer",
-                      3: "Fall"
-                    }
+                        0: "Winter",
+                        1: "Spring",
+                        2: "Summer",
+                        3: "Fall"
+                     };
     // updates the agenda header text
     d3.select(".agendaHeader")
       .text(function(d){
-               var title = `The entries from the list from ${year}'s ${seasonDict[season]} season'`
-               return title
-           })
+               var title = "The entries from the list from" +
+                           `${year}'s ${seasonDict[season]} season`;
+               return title;
+            });
 
-    var svg = d3.select(".agenda")
+    var svg = d3.select(".agenda");
     // removes all agendaentries
     svg.selectAll(".agendaEntry")
 					.remove()
 					.exit();
     //adjusts the height to an appropriate length
     svg.attr("height", function(d){
-                         var agendaHeight = 10 * entries.length
-                         return agendaHeight;;
+                         var agendaHeight = 10 * entries.length;
+                         return agendaHeight;
                        });
     // check if there is any entries to show in the agenda, else creates a list of the found entries
     if (entries.length == 0){
         svg.append("g")
             .text("------------------No entries in List-----------------")
-            .attr("class", "agendaEntry")
+            .attr("class", "agendaEntry");
     }
     else{
         for (entry of entries){
@@ -409,6 +438,5 @@ const updateAgenda = function(entries, season, year){
                 .text(entry)
                 .attr("class", "agendaEntry");
             };
-        }
-
-}
+    };
+};
