@@ -1,11 +1,4 @@
 /*
-To do(-), done(+)  {
-- comments
-- clean code
-+ seperate code
-- give porper credt
-- bugfix, capitalletter
-
 Repository
 - In (bijna) elke map een README.md toevoegen.
 + JavaScripts in stukjes hakken is fijn voor het overzicht.

@@ -6,8 +6,11 @@ a selection of what to represent
 
 data obtained from crawling a MyAnimeList(MAL) account
 
-Tooltip credit to Alan Dunning for everything that has been done with the V5-usable tooltip:
-link to used site: https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7
+Horizontal Barchart: Aravind Cheekkallur
+- https://bl.ocks.org/caravinden/eb0e5a2b38c8815919290fa838c6b63b
+
+Tooltip credit to Alan Dunning:
+-https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7
 */
 
 
