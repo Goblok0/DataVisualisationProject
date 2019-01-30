@@ -8,6 +8,7 @@ data obtained from crawling a MyAnimeList(MAL) account
 
 credit on how to sort on two variables:
 - https://coderwall.com/p/ebqhca/javascript-sort-by-two-fields
+- https://stackoverflow.com/questions/13211709/javascript-sort-array-by-multiple-number-fields
 
 credit to slider code:
 - https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
