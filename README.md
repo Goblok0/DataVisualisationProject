@@ -35,9 +35,11 @@ The created programs make use of several pieces of code or functions written by 
     * Code of how to use the slider from [This Library](https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js)
   * Jane Pong: https://blockbuilder.org/officeofjane/11b54880abcb6b844637cb1d7a120cd5 , https://bl.ocks.org/officeofjane/11b54880abcb6b844637cb1d7a120cd5/1bb2d282e7b1aeb98b2e2a9457e22754df247735
     * Code on how to create a heatmap
+  
+
 Picture file obtained from [imgur](http://i.imgur.com/dU4FaJU.png)  
 Data scraped from myanimelist.net
    
   
-### License
+##### License
 Copyright © 2019, Julian Evalle. Released under the MIT License.
