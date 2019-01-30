@@ -126,3 +126,6 @@
 * functies zijn in aparte files verdeeld
 * indien ik het nog niet eerder had vermeld in dit document. de kleuren van de barchart zin in gradient om meer aan te tonen dat je met meer of minder voorkomende data bezig bent zelfs wanneer je wisselt tussen big en small data
 * functie geschreven voro de amount of ticks in de linechart, linechart gaf bij lage waardes geen hele getallen en ".tickFormat(d3.format("d"))" gaf hele getallen, maar dubbele nummers. tot zover ik op internet heb gezocht is er geen universele oplossing voor lage getallen.
+
+## day 19
+* comments, structuur en README gemaakt
