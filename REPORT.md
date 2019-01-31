@@ -16,7 +16,8 @@ The general structure of each visualization file consists of a function that:
 ![alt text](doc/product_diagram.png)
 * Square boxes: the JS file
 * Rounded square boxes: functions
-* oval boxes: user interaction
+* oval boxes: user interaction  
+  
 (Typo below updateHeat(), should be update boxcolours)
 
 ### Data
