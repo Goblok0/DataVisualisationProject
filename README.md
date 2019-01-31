@@ -3,6 +3,8 @@
 * Name Application: MAL-Visualizer
 * Creator: Julian Evalle, student at University of Amsterdam
 * Link to HTML: [Github](https://goblok0.github.io/DataVisualisationProject/code/html/mal.html)
+* Link to Video Showcase: [Youtube](https://youtu.be/nUbVy6V6DoE)
+
 ### ScreenShot
 ![alt text](doc/product.png)
 * Picture shows a div-element overlapping with another, this is only present in the full-page screenshot, not in the HTML itself
