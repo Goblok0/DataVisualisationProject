@@ -128,4 +128,5 @@
 * functie geschreven voro de amount of ticks in de linechart, linechart gaf bij lage waardes geen hele getallen en ".tickFormat(d3.format("d"))" gaf hele getallen, maar dubbele nummers. tot zover ik op internet heb gezocht is er geen universele oplossing voor lage getallen.
 
 ## day 19
-* comments, structuur en README gemaakt
+* comments, structuur en READMEs gemaakt
+* verder de about.html page verder uitgewerkt
