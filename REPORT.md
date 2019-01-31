@@ -70,7 +70,7 @@ Is only called once by the window.onload() and creates the SVG, axis, labels and
 Updates the bars depending on which radio buttons are selected.
 Is called upon each time a new list is chosen or the radio button selection besides the barchart is altered.
 
-###### Interactivity Barchart
+##### Interactivity Barchart
 The main interactivity with the barchart consists of mouse-hovering which shows the amount or percentile value of the bar within the list. Furthermore clicking on a genre-bar will result in updating the heatmap to that genre within the list.
 
 #### Linechart
@@ -88,7 +88,7 @@ Is called upon each time a new list is chosen or a change in checkbox is made. S
 ##### updateLOptions(): updates the checkboxes
 Removes, creates and updates the checkboxes besides the linechart. is called upon initialization and when a different list is selected
 
-###### Interactivity Linechart
+##### Interactivity Linechart
 The main interactivity with the linechart consists of mouse-hovering which shows which genre the line represents. Furthermore clicking on a genre-line will result in updating the heatmap to that genre within the list. The linechart can be updated by selecting different lists or checking/unchecking checkboxes.
 
 #### Heatmap
@@ -105,7 +105,7 @@ Is called upon each time a new genre is selected or the value of the slider has 
 ##### updateAgenda(): updates the agenda besides the heatmap
 Removes previous entries and inserts the entries from the year and season which are selected. is called upon each time a box is clicked
 
-###### Interactivity Heatmap
+##### Interactivity Heatmap
 The main interactivity with the heatmap consists of the slider, which updates the heatmap whenever the user slides it. Furthermore clicking on a box will result in the elements beside the heatmap showing which entries are present in the list in that year and season.  
 
 ## Challenges/Decisions
