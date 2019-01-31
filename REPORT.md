@@ -187,7 +187,7 @@ The main interactivity with the heatmap consists of the slider, which updates th
 * The entries in the agenda are placed as list items
   * before only a newline seperated previous entries. By placing them as listitems, the agenda becomes more structured and easier for the user to gauge the amount.
 
-## Defend Decision
+### Defend Decision dropping Studios from other charts
 As briefly discussed in the previous section. One of the biggest features I dropped was the representation of studios. This is because I realized that it would be uninteresting and a general waste of time to visualize in the other charts besides the barchart. The reason for this is due to production quantity of studios being very low, which would result in around ~3 entries at best within a year. Moreover it is possible that a studio did not produce anything in a year, which would make the yearly visualization futile. This is because the user is not sure whether lack of entries in that year is due to him/her not seeing anything of that studio within that year or if it is because the studio did not produce anything that year. Lastly, with how low the values would be, the charts would be rather boring to look at.
 
 
